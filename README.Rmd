@@ -28,3 +28,4 @@ Basic introduction to tools
 * cloud platforms and tools: Azure, Spark, etc.
 * parallel computing, different models (shared vs distributed memory etc)
 
+## References

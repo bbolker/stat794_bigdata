@@ -31,6 +31,8 @@ Basic introduction to tools
 - parallel computing, different models (shared vs distributed memory
   etc)
 
+## References
+
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
 
