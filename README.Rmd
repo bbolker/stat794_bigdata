@@ -15,6 +15,7 @@ Basic introduction to tools
 
 * "Big Book of R" section on [Data, Databases and Engineering](https://www.bigbookofr.com/chapters/data%20databases%20and%20engineering), especially (?) @frantzExploring
 * ditto, [Big Data section](https://www.bigbookofr.com/chapters/big%20data)
+* [CRAN high-performance computing task view](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
 
 ## Topics (in no particular order)
 

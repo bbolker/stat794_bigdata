@@ -1,6 +1,6 @@
 Stats 744/big data
 ================
-30 July 2025
+02 August 2025
 
 (the `.md` version of this file is rendered from `README.Rmd`, please
 edit there)
@@ -17,6 +17,8 @@ Basic introduction to tools
   especially (?) Frantz (2020)
 - ditto, [Big Data
   section](https://www.bigbookofr.com/chapters/big%20data)
+- [CRAN high-performance computing task
+  view](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
 
 ## Topics (in no particular order)
 
