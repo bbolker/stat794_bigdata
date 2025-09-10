@@ -44,6 +44,7 @@ Basic introduction to tools
   <http://www.noamross.net/blog/2013/4/25/faster-talk.html>.
 - <https://cran.r-project.org/web/views/HighPerformanceComputing.html>
 - <https://missing.csail.mit.edu/2020/data-wrangling/>
+- <https://github.com/bbolker/compstatsR>
 
 ## References
 
