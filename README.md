@@ -1,6 +1,6 @@
 Stats 744/big data
 ================
-02 August 2025
+10 September 2025
 
 (the `.md` version of this file is rendered from `README.Rmd`, please
 edit there)
@@ -32,6 +32,18 @@ Basic introduction to tools
 - cloud platforms and tools: Azure, Spark, etc.
 - parallel computing, different models (shared vs distributed memory
   etc)
+
+## More links (again in no particular order)
+
+- <https://fastverse.github.io/fastverse/>
+  \<<https://fastverse.github.io/fastverse/>\*
+  <https://hackmd.io/@dushoff/theobioSummerLearning#containers-Docker-etc>
+- Ross, Noam. 2013. “FasteR! HigheR! StrongeR! - A Guide to Speeding Up
+  R Code for Busy People.” Noam Ross, April 25.
+  <http://www.noamross.net/blog/2013/4/25/faster-talk.html>
+  <http://www.noamross.net/blog/2013/4/25/faster-talk.html>.
+- <https://cran.r-project.org/web/views/HighPerformanceComputing.html>
+- <https://missing.csail.mit.edu/2020/data-wrangling/>
 
 ## References
 
