@@ -13,7 +13,7 @@ Basic introduction to tools
 
 ## References (in no particular order)
 
-* "Big Book of R" section on [Data, Databases and Engineering](https://www.bigbookofr.com/chapters/data%20databases%20and%20engineering), especially (?) @frantzExploring
+* "Big Book of R" section on [Data, Databases and Engineering](https://www.bigbookofr.com/chapters/data%20databases%20and%20engineering), especially [Enterprise Databases with R](https://smithjd.github.io/sql-pet/) [@smithexploring]
 * ditto, [Big Data section](https://www.bigbookofr.com/chapters/big%20data)
 * [CRAN high-performance computing task view](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
 
@@ -33,7 +33,7 @@ Basic introduction to tools
 
 
 * https://fastverse.github.io/fastverse/ <https://fastverse.github.io/fastverse/* https://hackmd.io/@dushoff/theobioSummerLearning#containers-Docker-etc
-* Ross, Noam. 2013. “FasteR! HigheR! StrongeR! - A Guide to Speeding Up R Code for Busy People.” Noam Ross, April 25.  http://www.noamross.net/blog/2013/4/25/faster-talk.html <http://www.noamross.net/blog/2013/4/25/faster-talk.html>.
+* Ross, Noam. 2013. “FasteR! HigheR! StrongeR! - A Guide to Speeding Up R Code for Busy People.” Noam Ross, April 25.  http://www.noamross.net/blog/2013/4/25/faster-talk.html <http://www.noamross.net/blog/2013/4/25/faster-talk.html.
 * https://cran.r-project.org/web/views/HighPerformanceComputing.html
 * https://missing.csail.mit.edu/2020/data-wrangling/
 * https://github.com/bbolker/compstatsR

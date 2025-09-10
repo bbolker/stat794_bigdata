@@ -14,7 +14,8 @@ Basic introduction to tools
 
 - “Big Book of R” section on [Data, Databases and
   Engineering](https://www.bigbookofr.com/chapters/data%20databases%20and%20engineering),
-  especially (?) Frantz (2020)
+  especially [Enterprise Databases with
+  R](https://smithjd.github.io/sql-pet/) (Smith et al. 2020)
 - ditto, [Big Data
   section](https://www.bigbookofr.com/chapters/big%20data)
 - [CRAN high-performance computing task
@@ -41,7 +42,7 @@ Basic introduction to tools
 - Ross, Noam. 2013. “FasteR! HigheR! StrongeR! - A Guide to Speeding Up
   R Code for Busy People.” Noam Ross, April 25.
   <http://www.noamross.net/blog/2013/4/25/faster-talk.html>
-  <http://www.noamross.net/blog/2013/4/25/faster-talk.html>.
+  \<<http://www.noamross.net/blog/2013/4/25/faster-talk.html>.
 - <https://cran.r-project.org/web/views/HighPerformanceComputing.html>
 - <https://missing.csail.mit.edu/2020/data-wrangling/>
 - <https://github.com/bbolker/compstatsR>
@@ -51,9 +52,10 @@ Basic introduction to tools
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
 
-<div id="ref-frantzExploring" class="csl-entry">
+<div id="ref-smithexploring" class="csl-entry">
 
-Frantz, M. Edward (Ed) Borasky, Sophie Yang. 2020. *Exploring Enterprise
+Smith, John David, Sophie Yang, M. Edward Borasky, Jim Tyhurst, Scott
+Came, Mary Anne Thygesen, and Ian Frantz. 2020. *Exploring Enterprise
 Databases with R: A Tidyverse Approach*.
 <https://smithjd.github.io/sql-pet/>.
 
