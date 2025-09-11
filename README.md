@@ -1,6 +1,6 @@
 Stats 744/big data
 ================
-10 September 2025
+11 September 2025
 
 (the `.md` version of this file is rendered from `README.Rmd`, please
 edit there)
@@ -46,6 +46,49 @@ Basic introduction to tools
 - <https://cran.r-project.org/web/views/HighPerformanceComputing.html>
 - <https://missing.csail.mit.edu/2020/data-wrangling/>
 - <https://github.com/bbolker/compstatsR>
+
+## Docker/adventureworks stuff
+
+I think this works (in lieu of what is suggested in sections 4.4-4.7 of
+the Smith et al book)
+
+In a shell (RStudio Terminal or a standalone terminal/shell window):
+
+``` bash
+## set MYDIR to somewhere sensible on your system
+## I think the only important thing is that this be a *writeable* directory
+## export MYDIR=/home/bolker/Documents/classes/stat794_bigdata/sql-pet
+export MYDIR=/tmp
+## get/update postgres image
+docker pull postgres
+## clean up
+docker rm --force adventureworks
+## start up the container
+docker run -e POSTGRES_PASSWORD="psql" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11 
+docker exec -i adventureworks psql -U postgres -c "CREATE DATABASE adventureworks;"
+```
+
+Then in R/RStudio:
+
+``` r
+library(DBI)
+con <- dbConnect(          # use in other settings
+  RPostgres::Postgres(),
+  # without the previous and next lines, some functions fail with bigint data 
+  #   so change int64 to integer
+  bigint = "integer",  
+  host = "localhost",
+  port = 5432,  # this version still using 5432!!!
+  user = "postgres",
+  password = "psql",
+  dbname = "adventureworks"
+)
+print(con)
+```
+
+If this all worked you should see
+
+    <PqConnection> adventureworks@localhost:5432
 
 ## References
 
