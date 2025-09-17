@@ -54,8 +54,23 @@ docker pull postgres
 ## clean up
 docker rm --force adventureworks
 ## start up the container
-docker run -e POSTGRES_PASSWORD="psql" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11 
-docker exec -i adventureworks psql -U postgres -c "CREATE DATABASE adventureworks;"
+docker run -e POSTGRES_PASSWORD="psql" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11
+```
+
+## New instructions
+
+Install docker-compose: https://docs.docker.com/compose/
+
+``` bash
+git clone https://github.com/lorint/AdventureWorks-for-Postgres.git
+cd AdventureWorks-for-Postgres
+## if you have wget ... otherwise download this file manually
+wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks-oltp-install-script.zip
+cp AdventureWorks-oltp-install-script.zip adventure_works_2014_OLTP_script.zip
+docker-compose up --build
+## switch to a new shell OR ctrl-Z; bg
+docker exec -i adventureworks-for-postgres_db_1 psql -U postgres -c "CREATE DATABASE Adventureworks;"
+docker exec -i adventureworks-for-postgres_db_1 psql -U postgres -d Adventureworks -f install.sql
 ```
 
 Then in R/RStudio:
@@ -70,16 +85,18 @@ con <- dbConnect(          # use in other settings
   host = "localhost",
   port = 5432,  # this version still using 5432!!!
   user = "postgres",
-  password = "psql",
-  dbname = "adventureworks"
+  password = "postgres",
+  dbname = "Adventureworks"
 )
 print(con)
+dbExecute(con, "set search_path to sales;")
+dbListTables(con)
 ```
 
-If this all worked you should see
+## junk
 
-```
-<PqConnection> adventureworks@localhost:5432
+``` bash
+docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11
 ```
 
 ## References
