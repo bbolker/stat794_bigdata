@@ -8,14 +8,21 @@ docker rm --force adventureworks
 ```{bash}
 git clone https://github.com/lorint/AdventureWorks-for-Postgres.git
 ## OR download zip file and unzip (see below)
-cd AdventureWorks-for-Postgres.git
+cd AdventureWorks-for-Postgres
 wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks-oltp-install-script.zip
 mv AdventureWorks-oltp-install-script.zip adventure_works_2014_OLTP_script.zip
 ```
 
 [^1:] `wget` is a common command-line tool (but separate from the standard Unix shell tools): you can get it for Windows from [here](https://gnuwin32.sourceforge.net/packages/wget.htm); on MacOS, you can [install it via Homebrew](https://formulae.brew.sh/formula/wget).
 
-You can download the repository manually rather than via `git`, from [here](https://github.com/lorint/AdventureWorks-for-Postgres/archive/refs/heads/master.zip)
+You can download the repository manually rather than via `git`, from [here](https://github.com/lorint/AdventureWorks-for-Postgres/archive/refs/heads/master.zip). If you do it that way, you have to unzip manually:
+
+```{bash}
+unzip <zip_file_name>
+mv AdventureWorks-for-Postgres-master AdventureWorks-for-Postgres
+```
+
+AdventureWorks-for-Postgres
 
 3. Build docker image:
 
