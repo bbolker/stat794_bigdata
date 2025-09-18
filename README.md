@@ -23,6 +23,7 @@ Basic introduction to tools
 
 ## Topics (in no particular order)
 
+Topics schedule: https://docs.google.com/spreadsheets/d/1X_yuj-hH19vxhSGV42MTIn3VLFio6xspY77QqrA7eWM/edit?gid=0#gid=0
 - command line bullshittery (Docker etc.)
 - Arrow/Parquet
 - SQL and substitutes (e.g. `dbplyr`); also cf `data.table`
