@@ -21,7 +21,7 @@ You can download the repository manually rather than via `git`, from [here](http
 
 ```{bash}
 cd .. ## go back up one level
-docker build \-t mypsql AdventureWorks-for-Postgres/
+docker build -t mypsql AdventureWorks-for-Postgres/
 ```
 
 3. Start docker container

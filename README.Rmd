@@ -62,10 +62,4 @@ dbExecute(con, "set search_path to sales;")
 dbListTables(con)
 ```
 
-## junk
-
-``` bash
-docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11
-```
-
 ## References
