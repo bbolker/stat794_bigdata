@@ -31,7 +31,7 @@ Basic introduction to tools
 
 ## More links (again in no particular order)
 
-
+* Sievertsen, Hans Henrik. 2025. “EN: Moving to Duckdb and Sql.” Substack newsletter. Hans Henrik Sievertsen, July 11. https://hanshenriksievertsen.substack.com/p/moving-to-duckdb-and-sql.
 * https://fastverse.github.io/fastverse/ <https://fastverse.github.io/fastverse/* https://hackmd.io/@dushoff/theobioSummerLearning#containers-Docker-etc
 * Ross, Noam. 2013. “FasteR! HigheR! StrongeR! - A Guide to Speeding Up R Code for Busy People.” Noam Ross, April 25.  http://www.noamross.net/blog/2013/4/25/faster-talk.html <http://www.noamross.net/blog/2013/4/25/faster-talk.html.
 * https://cran.r-project.org/web/views/HighPerformanceComputing.html
