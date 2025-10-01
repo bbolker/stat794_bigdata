@@ -698,7 +698,7 @@ check both implementations (i.e., Bash and R) return the same top 5 words with t
 * I got bored here... this feels like maybe something to skip for now...
 
 # 6 Project Management with Make
-"I hope that by now you have come to appreciate that the command line is a very convenient environment for working with data." Young person question: why do we not learn how to use the terminal/command line properly prior to grad/professional work/did old (not actually old, but not like 20) people also just have to learn it on their own? 
+"I hope that by now you have come to appreciate that the command line is a very convenient environment for working with data." Young person question: why do we not learn how to use the terminal/command line properly prior to grad/professional work/did old people (not actually old, but not like 20) (I swear I'm not calling you old Ben...) also just have to learn it on their own? 
 
 ## 6.1 Overview
 
