@@ -32,7 +32,7 @@ But there are no contents inside of it...
 3. Run the image with a *volume*. To get data in and out of the container (i.e., the data we just downloaded), add a volume (i.e., a local directory gets mapped to a directory inside the container). Adding a volume is done like this: 
 
 ```
-  docker run --rm -it -v "$(pwd)":/data datasciencetoolbox/dsatcl2e-data
+  docker run --rm -it -v "$(pwd)":/data datasciencetoolbox/dsatcl2e
 ```
 
 * Comment from BMB: the -v argument of docker run is of the format <local directory>:<location within docker container>. Using /data as the location within the container means you have to cd /data after you start the container.
