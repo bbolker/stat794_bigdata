@@ -436,9 +436,10 @@ step-by-step explanation of the above command: \n
 
 ```
   cp -v top-words-{2,3}.sh
+  nano top-words-3.sh
 ```
  
-* Go ahead and type #!/usr/bin/env/bash and press Enter. When you’re ready, press Ctrl-X to save and exit.
+* type #!/usr/bin/env/bash and press Enter. When you’re ready, press Ctrl-X to save and exit.
 * confirm what top-words-3.sh looks like:
 
 ```
