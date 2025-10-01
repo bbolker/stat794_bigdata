@@ -495,12 +495,15 @@ step-by-step explanation of the above command: \n
 
 ```
   curl -sL "https://www.gutenberg.org/files/11/11-0.txt" > alice.txt
+  < alice.txt ./top-words-5.sh 20
 ```
 * if the user does not specify a number, then the script will show the top 10 most common words:
 
 ```
   < alice.txt ./top-words-5.sh
 ```
+
+* Emma: this doesn't work for me -- does it always need the num_words input? 
 
 ### 4.2.6 Step 6: Extend Your PATH
 
