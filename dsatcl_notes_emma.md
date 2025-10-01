@@ -148,6 +148,18 @@ Now we are in the image/container and the data we need is also there -- why/how?
   tar -xzf logs.tar.gz
 ```
 
+* From class: if you ran the above line, try:
+
+```
+  tar -tzf logs.tar.gz | xargs rm
+```
+
+ OR: 'globbing'
+
+ ```
+  rm E1F*
+```
+
 * flags:
   * -x: extract files from an archive
   * -z: use the gzip as the decompression algorithm
