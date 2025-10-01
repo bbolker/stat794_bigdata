@@ -44,7 +44,7 @@ But there are no contents inside of it...
   cd /data 
 ```
 
-Now we are in the image/container and the data we need is also there!
+Now we are in the image/container and the data we need is also there -- why/how? 
 
 
 # 3 Obtaining Data
@@ -71,7 +71,7 @@ Now we are in the image/container and the data we need is also there!
 ```
 
 ##  3.2 Copying Local Files to the Docker Container 
- * This sections talks about copy local files to the container... but my container just has all the local files already in it...
+ * This sections talks about copying local files to the container... but my container just has all the local files already in it...
  * I'm skipping this... it's just the command 'cp [local files] [directory to be moved to]'
  * If I start the image with a volume in the directory the data is in, why is the data already there? did it get automatically copied over...? 
 
@@ -79,10 +79,11 @@ Now we are in the image/container and the data we need is also there!
 
 ### 3.3.1 Introducing curl
 * Note from BMB: wget also works... curl is more powerful?
+* Emma: when should we use curl vs wget?
 
 * Curl:
   * downloads the data and, by default, prints it to standard output
-  *  doesn’t do any interpretation, but luckily other command-line tools can be used to process the data further
+  * doesn’t do any interpretation
   * Example: 
   
   ```
@@ -90,7 +91,7 @@ Now we are in the image/container and the data we need is also there!
   ```
   
   * by default, curl outputs a progress meter that shows the download rate and the expected time of completion
-  * this output isn’t written to standard output, but a separate channel: standard error
+  * this output isn’t written to standard output, but a separate channel: standard error -- I'm confused about what this means...
   * information can be useful when downloading very large files, the -s option can silence this output
   * example:
   
@@ -183,8 +184,9 @@ Now we are in the image/container and the data we need is also there!
 ##  3.5 Converting Microsoft Excel Spreadsheets to CSV 
 * CSVkit: tools used in this section (in2csv, csvgrep, and csvlook) are part of this package (?)
 * in2csv: command-line tool that converts Microsoft Excel spreadsheets to CSV files
-*  CSV stands for comma-separated values (didn't know that!)
-* Yakov Shafranovich defines the CSV format according to the following three points:
+* CSV stands for comma-separated values (didn't know that!)
+* Bat vs CSVlook (with Teenage Mutant Ninja Turtles):
+  * Bat: 
   1. Each record is located on a separate line, delimited by a line break (␊). Take, for example, the following CSV file with crucial information about the Teenage Mutant Ninja Turtles:
 
   ```
@@ -203,7 +205,8 @@ Now we are in the image/container and the data we need is also there!
   ```
     bat -A tmnt-with-header.csv
   ```
-* CSV not too readable: csvlook is a tool that data can be piped to and nicelt formatted:
+  * CSV is not too readable: csvlook is a tool that data can be piped to and nicelt formatted:
+  * CSV: 
 
 ```
   csvlook tmnt-with-header.csv
@@ -236,7 +239,7 @@ Now we are in the image/container and the data we need is also there!
 * value after --regex options is a regular expression (or regex) (special syntax for defining patterns)
 
 * Notes:
-  * format of the file is automatically determined by the extension, .xlsx in this case -- need to specify the format explicitly when piping to in2csv
+  * format of the file is automatically determined by the extension (.xlsx) -- need to specify the format explicitly when piping to in2csv
   * spreadsheet can contain multiple worksheets. in2csv extracts, by default, the first worksheet. To extract a different worksheet, need to pass the name of worksheet to the --sheet option (can use the --names option, which prints the names of all the worksheets, if unsure about name):
   ```
     in2csv --names top2000.xlsx
@@ -348,7 +351,7 @@ Now we are in the image/container and the data we need is also there!
 step-by-step explanation of the above command: \n
 * curl: Downloading an ebook using curl
 * tr: Converting the entire text to lowercase using tr
-* grep: Extracting all the words using grep48 and put each word on separate line
+* grep: Extracting all the words using grep48 and put each word on separate line (-o: only matching, -E: extened regrex) 
 * sort: Sort these words in alphabetical order using sort
 * uniq: Remove all the duplicates and count how often each word appears in the list using uniq
 * sort: Sort this list of unique words by their count in descending order using sort
@@ -702,7 +705,7 @@ check both implementations (i.e., Bash and R) return the same top 5 words with t
 * I got bored here... this feels like maybe something to skip for now...
 
 # 6 Project Management with Make
-"I hope that by now you have come to appreciate that the command line is a very convenient environment for working with data." Young person question: why do we not learn how to use the terminal/command line properly prior to grad/professional work/did old people (not actually old, but not like 20) (I swear I'm not calling you old Ben...) also just have to learn it on their own? 
+"I hope that by now you have come to appreciate that the command line is a very convenient environment for working with data." Young person question: why do we not learn how to use the terminal/command line properly prior to grad/professional work/did old people (not actually old, but not like 20) (I swear I'm not calling you old Ben...) also learn it on their own? 
 
 ## 6.1 Overview
 
@@ -877,4 +880,4 @@ Makefile step by step:
   make
 ```
 
-* Emma: confused on this chapter... I'm clear on how the shell knows what to do when "make" or "makefile" is called... how is this better than simply creating and executing our own .sh files like in chapter 4? 
+* Emma: confused on this chapter... I'm not clear on how the shell knows what to do when "make" or "makefile" is called... If I understand correctly, this is essentially automating a workflow? 
