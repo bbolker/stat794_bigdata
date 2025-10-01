@@ -1,4 +1,5 @@
 # 1 Introduction 
+all note taken from: https://jeroenjanssens.com/dsatcl/
 
 ## 1.1 Data Is OSEMN 
 
