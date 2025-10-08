@@ -9,5 +9,5 @@
 code
 ```
 
--[] checklist
--[x] finish checklist
+- [ ] checklist
+- [x] finish checklist
