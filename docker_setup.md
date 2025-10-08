@@ -34,7 +34,7 @@ docker build -t mypsql AdventureWorks-for-Postgres/
 3. Start docker container
 
 ```{bash}
-docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source=.,target=/petdir mypsql
+docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source=$(pwd),target=/petdir mypsql
 ```
 
 4. Create and populate database inside the container

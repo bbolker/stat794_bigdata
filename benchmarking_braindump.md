@@ -27,6 +27,7 @@
 * external mem profiling tool: https://github.com/mrc-ide/memprof
 * `profvis`
 * `aprof`: https://github.com/MarcoDVisser/aprof
+* another example with `profvis`: https://csgillespie.github.io/efficientR/performance.html
 * https://github.com/bbolker/compstatsR/blob/master/session1.rmd
 * Profiling C code: 
     * https://stackoverflow.com/a/60265409/190277
