@@ -8,8 +8,11 @@
   * Data analysis with dplyr syntax: https://arrow.apache.org/docs/r/articles/data_wrangling.html
   * Working with multi-file datasets: https://arrow.apache.org/docs/r/articles/dataset.html 
   * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
-  * 
- 
+* Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
+
+## 1.1 Introduction & Data Types
+
+
 ```
 code
 ```
