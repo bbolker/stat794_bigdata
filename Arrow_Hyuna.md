@@ -37,7 +37,6 @@ unzip(
   zipfile = "your_directory/nyc-taxi-tiny.zip", 
   exdir = "your_directory/"
 )
-
 ```
 
 ## 1. Introduction & Basics
@@ -85,6 +84,16 @@ glimpse()
 ```
 
 #### Parquet
+* language-agnostic file format
+* like .csv, stores tabular data but is oriented column-wise (like Arrow)
+* supports efficient encoding & compression
+* supports nested/chunked data
+* saves memory!
+* See also: Feather (Arrow IPC) file format
+
+```
+
+```
 
 - [ ] checklist
 - [x] finish checklist
