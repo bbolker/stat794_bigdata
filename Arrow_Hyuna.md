@@ -18,26 +18,29 @@
 ```
 install.packages("arrow")
 
+# tiny Seattle dataset
 options(timeout = 1800)
 download.file(
-  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/taxi_zone_lookup.csv",
-  destfile = "your_directory/taxi_zone_lookup.csv"
+  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/seattle-library-checkouts-tiny.csv",
+  destfile = "your_directory/seattle-library-checkouts-tiny.csv"
 )
 
+# tiny NYC dataset
+options(timeout = 1800)
 download.file(
-  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/taxi_zones.zip",
-  destfile = "your_directory/taxi_zones.zip"
+  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/nyc-taxi-tiny.zip",
+  destfile = "your_directory/nyc-taxi-tiny.zip"
 )
 
-# Extract the spatial files from the zip folder:
+# Extract the partitioned parquet files from the zip folder:
 unzip(
-  zipfile = "data/taxi_zones.zip", 
-  exdir = "your_directory/taxi_zones"
+  zipfile = "your_directory/nyc-taxi-tiny.zip", 
+  exdir = "your_directory/"
 )
 
 ```
 
-## 1. Introduction & Data Types
+## 1. Introduction & Basics
 ### 1.1 What Is Arrow
 
 * language-agnostic tool
@@ -51,10 +54,37 @@ unzip(
 
 ### 1.1 Data Objects & How to Read Them
 
+#### 1.1.1 Unique Data Objects in Arrow
+* Array and chunked array: different from arrays in R, more comparable to lists and nested lists (list of lists)
+* Record batch: tabular (column-wise), set of named arrays of the same length
+  * creates schema for you according to the names of the arrays
+  * can use ```$``` or ```[[column_number]]``` to pull specific schema like in base R
+  * can use ```[]``` to pull rows and columns like in base R
+* Table: set of named chunked arrays
+  * acts like a record batch
+  * can concatenate (unlike a record batch)
+* Dataset: abstraction of tabular data with schema
+  * not in-memory unlike record batches or tables
+  * can do queries with dplyr
+    * Data are only loaded into memory as needed, only when a query pulls them
 
 ```
-code
+Array$create() # creating arrays
+
+chunked_array() # creating chunked arrays, equivalent to:
+ChunkedArray$create()
+
+record_batch() # creating record batches, equivalent to:
+RecordBatch$create()
+
+arrow_table() # creating a table
+concat_tables() # concatenating tables
+
+open_dataset() # often used with
+glimpse()
 ```
+
+#### Parquet
 
 - [ ] checklist
 - [x] finish checklist
