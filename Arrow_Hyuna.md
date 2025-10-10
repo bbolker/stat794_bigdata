@@ -40,6 +40,9 @@ unzip(
 ```
 
 ## 1. Introduction & Basics
+
+Is for larger-than-memory datasets and ``lazy evaulation''
+
 ### 1.1 What Is Arrow
 
 * language-agnostic tool
@@ -48,8 +51,6 @@ unzip(
 * is available through the ``` arrow ``` package in R
 * ```dplyr``` backend
 * is very fast!
-* Usually paired with Parquet-formatted data
-  * Parquet: column-oriented data format, provides efficient storage, retrieval, compression, and encoding for complex data in bulk
 
 ### 1.1 Data Objects & How to Read Them
 
@@ -83,12 +84,13 @@ open_dataset() # often used with
 glimpse()
 ```
 
-#### Parquet
+#### 1.1.2 Parquet
+* Usually used alongside Arrow
 * language-agnostic file format
 * like .csv, stores tabular data but is oriented column-wise (like Arrow)
-* supports efficient encoding & compression
+* supports efficient storage, retrieval, compression, and encoding for complex data in bulk
 * supports nested/chunked data
-* saves memory!
+* saves memory! 
 * See also: Feather (Arrow IPC) file format
 
 ```
