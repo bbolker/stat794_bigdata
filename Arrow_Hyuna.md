@@ -13,14 +13,26 @@
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
 
 ### Files/Software
-* Install Arrow R Package
+* Install Arrow R Package (assuming you have dplyr, duckDB, etc.)
 * Install NYC Taxi and Seattle Library datasets (sorry...)
 ```
 install.packages("arrow")
-curl::multi_download(
-  "https://r4ds.s3.us-west-2.amazonaws.com/seattle-library-checkouts.csv",
-  "directory/your_file_name",
-  resume = TRUE
+
+options(timeout = 1800)
+download.file(
+  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/taxi_zone_lookup.csv",
+  destfile = "your_directory/taxi_zone_lookup.csv"
+)
+
+download.file(
+  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/taxi_zones.zip",
+  destfile = "your_directory/taxi_zones.zip"
+)
+
+# Extract the spatial files from the zip folder:
+unzip(
+  zipfile = "data/taxi_zones.zip", 
+  exdir = "your_directory/taxi_zones"
 )
 
 ```
