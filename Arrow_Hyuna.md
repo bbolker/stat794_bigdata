@@ -52,7 +52,7 @@ Is for larger-than-memory datasets and ``lazy evaulation''
 * ```dplyr``` backend
 * is very fast!
 
-### 1.2 Data Objects & How to Read Them
+### 1.2 Data Objects
 
 #### 1.2.1 Unique Data Objects in Arrow
 * Array and chunked array: different from arrays in R, more comparable to lists and nested lists (list of lists)
