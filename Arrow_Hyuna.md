@@ -41,7 +41,7 @@ unzip(
 
 ## 1. Introduction & Basics
 
-Is for larger-than-memory datasets and ``lazy evaulation''
+Is for larger-than-memory datasets and "lazy evaulation"
 
 ### 1.1 What Is Arrow
 
@@ -104,7 +104,12 @@ write_dataset()
 
 ## 2. Reading Data & Partitioning
 ### 2.1 Reading a Dataset
-Read in the Seattle Library dataset:
+Read in the Seattle Library dataset using Arrow:
 ```
-
+# read.csv() is not recommended for a big dataset like this
+seattle_csv <- open_dataset(
+  sources = "Arrow/seattle-library-checkouts.csv", 
+  col_types = schema(ISBN = string()), # because ISBN column is empty
+  format = "csv"
+)
 ```
