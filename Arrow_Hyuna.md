@@ -103,13 +103,73 @@ write_dataset()
 ```
 
 ## 2. Reading Data & Partitioning
-### 2.1 Reading a Dataset
+### 2.1 Load Libraries
+```
+library(arrow)
+library(dplyr)
+```
+### 2.2 Reading a Dataset
 Read in the Seattle Library dataset using Arrow:
 ```
 # read.csv() is not recommended for a big dataset like this
+
 seattle_csv <- open_dataset(
-  sources = "Arrow/seattle-library-checkouts.csv", 
-  col_types = schema(ISBN = string()), # because ISBN column is empty
+  sources = "Arrow/seattle-library-checkouts-tiny.csv", 
+  col_types = schema(ISBN = string()),
+  # other columns will be taken care of by arrow automatically
   format = "csv"
 )
+
+seattle_csv
+glimpse(seattle_csv) # dplyr function
+class(seattle_csv)
+```
+
+### 2.2 Partitioning
+cf. ```dplyr::group_by()```
+
+#### 2.2.1 Single-Level Partitioning
+```
+# dplyr
+seattle_csv |> 
+  group_by(CheckoutYear) |> 
+  summarise(Checkouts = sum(Checkouts)) |> 
+  arrange(CheckoutYear) |> 
+  collect()
+
+seattle_csv |> write_dataset(
+  path = "Arrow/seattle_partitioned",
+  # format = c("parquet")
+  partitioning = "CheckoutYear"
+  # hive_style = TRUE is default, file names as column=value
+  )
+
+list.files("Arrow/seattle_partitioned")
+list.files("Arrow/seattle_partitioned/CheckoutYear=2005") 
+```
+
+#### 2.2.2 Multi-Level Partitioning
+```
+write_dataset(seattle_csv,
+              path = "Arrow/seattle_twice_partitioned",
+              partitioning = c("CheckoutYear", "MaterialType") # top to bottom in order !
+              )
+
+list.files("Arrow/seattle_twice_partitioned") 
+list.files("Arrow/seattle_twice_partitioned/CheckoutYear=2005")
+```
+
+#### 2.2.3 Reading partitioned data
+```
+seattle_partitioned <- open_dataset("Arrow/seattle_twice_partitioned")
+seattle_partitioned
+
+seattle_partitioned2 <- open_dataset(
+  "Arrow/seattle_twice_partitioned",
+  partitioning = c("CheckoutYear", "MaterialType"),
+  hive_style = TRUE)
+seattle_partitioned2
+
+seattle_2022_BOOK <- open_dataset("Arrow/seattle_twice_partitioned/CheckoutYear=2022/MaterialType=BOOK/part-0.parquet")
+seattle_2022_BOOK
 ```
