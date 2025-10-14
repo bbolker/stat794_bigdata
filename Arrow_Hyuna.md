@@ -1,6 +1,6 @@
 # Arrow Classes I & II
-## Homework
-### Readings
+## 0. Homework
+### 0.1 Readings
 (in no particular order)
 * Chapter 22 Arrow in R for Data Science: https://r4ds.hadley.nz/arrow.html
 * Arrow R Package articles
@@ -12,7 +12,7 @@
   * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
 
-### Files/Software
+### 0.2 Files/Software
 * Install Arrow R Package (assuming you have dplyr, duckDB, etc.)
 * Install NYC Taxi and Seattle Library datasets (sorry...)
 ```
@@ -52,9 +52,9 @@ Is for larger-than-memory datasets and ``lazy evaulation''
 * ```dplyr``` backend
 * is very fast!
 
-### 1.1 Data Objects & How to Read Them
+### 1.2 Data Objects & How to Read Them
 
-#### 1.1.1 Unique Data Objects in Arrow
+#### 1.2.1 Unique Data Objects in Arrow
 * Array and chunked array: different from arrays in R, more comparable to lists and nested lists (list of lists)
 * Record batch: tabular (column-wise), set of named arrays of the same length
   * creates schema for you according to the names of the arrays
@@ -84,7 +84,7 @@ open_dataset() # often used with
 glimpse()
 ```
 
-#### 1.1.2 Parquet
+#### 1.2.2 Parquet
 * Usually used alongside Arrow
 * language-agnostic file format
 * like .csv, stores tabular data but is oriented column-wise (like Arrow)
@@ -94,8 +94,17 @@ glimpse()
 * See also: Feather (Arrow IPC) file format
 
 ```
+read_parquet()
+write_parquet()
 
+# Parquet is also the default format in:
+open_dataset()
+write_dataset()
 ```
 
-- [ ] checklist
-- [x] finish checklist
+## 2. Reading Data & Partitioning
+### 2.1 Reading a Dataset
+Read in the Seattle Library dataset:
+```
+
+```
