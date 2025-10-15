@@ -3,6 +3,10 @@
 ## https://cran.r-project.org/web/packages/GillespieSSA/index.html
 ## Gillespie SIR (Kermack-McKendrick) vignette:
 ##     https://cran.r-project.org/web/packages/GillespieSSA/vignettes/sir.html
+
+## odin would be much faster, but doesn't do Gillespie -- only
+##   http://epirecip.es/epicookbook/chapters/sir-stochastic-discretestate-discretetime/r_odin
+
 library(GillespieSSA)
 
 gsir <- function(parms = list(beta = 2, gamma = 1),
