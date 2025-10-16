@@ -103,19 +103,20 @@ write_dataset()
 ```
 
 ## 2. Reading Data & Partitioning
-### 2.1 Load Libraries
+Load libraries:
 ```
 library(arrow)
 library(dplyr)
 ```
-### 2.2 Reading a Dataset
+### 2.1 Reading a Dataset
 Read in the Seattle Library dataset using Arrow:
 ```
 # read.csv() is not recommended for a big dataset like this
 
 seattle_csv <- open_dataset(
   sources = "Arrow/seattle-library-checkouts-tiny.csv", 
-  col_types = schema(ISBN = string()),
+  # col_types = schema(ISBN = string()),
+  # providing partial schema
   # other columns will be taken care of by arrow automatically
   format = "csv"
 )
@@ -125,7 +126,7 @@ glimpse(seattle_csv) # dplyr function
 class(seattle_csv)
 ```
 
-### 2.2 Partitioning
+### 2.2 Data Engineering with Partitions
 cf. ```dplyr::group_by()```
 
 #### 2.2.1 Single-Level Partitioning
@@ -173,3 +174,88 @@ seattle_partitioned2
 seattle_2022_BOOK <- open_dataset("Arrow/seattle_twice_partitioned/CheckoutYear=2022/MaterialType=BOOK/part-0.parquet")
 seattle_2022_BOOK
 ```
+## 3. Benchmarking
+### 3.1 Comparing file sizes
+Original CSV file:
+```
+file.size("Arrow/seattle-library-checkouts-tiny.csv")/1e6 # in MB
+```
+
+Single Parquet file:
+```
+write_dataset(seattle_csv, path = "Arrow", 
+              basename_template = "seattle{i}.arrow")
+file.size("Arrow/seattle0.arrow")/1e6
+```
+
+Partitioned Parquet files:
+```
+tibble(
+  files = list.files("Arrow/seattle_partitioned", recursive = TRUE),
+  MB = file.size(file.path("Arrow/seattle_partitioned", 
+                           files)) / 1e6
+) |> mutate(cumMB = cumsum(MB))
+```
+
+### 3.2 Comparing file formats
+Using the local CSV file:
+```
+seattle_readcsv <- read.csv("Arrow/seattle-library-checkouts-tiny.csv")
+
+seattle_readcsv |> 
+  filter(CheckoutYear == 2021, MaterialType == "BOOK") |>
+  group_by(CheckoutMonth) |>
+  summarize(TotalCheckouts = sum(Checkouts)) |>
+  arrange(desc(CheckoutMonth)) |>
+  collect() |> 
+  system.time()
+```
+
+Using the arrow object created from the CSV file:
+```
+seattle_csv |> 
+  filter(CheckoutYear == 2021, MaterialType == "BOOK") |>
+  group_by(CheckoutMonth) |>
+  summarize(TotalCheckouts = sum(Checkouts)) |>
+  arrange(desc(CheckoutMonth)) |>
+  collect() |> 
+  system.time()
+```
+
+Using the Parquet files:
+```
+seattle_partitioned |> 
+  filter(CheckoutYear == 2021, MaterialType == "BOOK") |>
+  group_by(CheckoutMonth) |>
+  summarize(TotalCheckouts = sum(Checkouts)) |>
+  arrange(desc(CheckoutMonth)) |>
+  collect() |> 
+  system.time()
+```
+
+### 3.3 Comparing partitions
+```filter()``` in ```dplyr``` with partitioned variables:
+```
+seattle_partitioned %>%
+  filter(CheckoutYear == 2019, MaterialType == "BOOK") |> 
+  summarise(TotalCheckouts = sum(Checkouts)) |>
+  collect() |> 
+  system.time()
+```
+
+Partitioned with another variable:
+```
+write_dataset(seattle_csv, 
+              path = "Arrow/seattle_by_CheckoutType", 
+              partitioning = "CheckoutType")
+
+open_dataset("Arrow/seattle_by_CheckoutType") |> 
+  filter(CheckoutYear == 2019, MaterialType == "BOOK") |> 
+  summarise(TotalCheckouts = sum(Checkouts)) |>
+  collect() |> 
+  system.time()
+```
+
+## 4.0  ```dplyr``` with Arrow: Exercises
+22.5.3 from Wickham, Centinkaya-Rundel, and Grolemund (2023)
+### 4.1 
