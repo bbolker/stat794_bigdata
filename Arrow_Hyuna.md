@@ -15,7 +15,7 @@
 ### 0.2 Files/Software
 * Install Arrow R Package (assuming you have dplyr, duckDB, etc.)
 * Install NYC Taxi and Seattle Library datasets (sorry...)
-```
+```r
 install.packages("arrow")
 
 # tiny Seattle dataset
@@ -48,8 +48,8 @@ Is for larger-than-memory datasets and "lazy evaulation"
 * language-agnostic tool
 * in-memory columnar format: represents structured, table-like data
 * for efficient analysis and transport of large datasets
-* is available through the ``` arrow ``` package in R
-* ```dplyr``` backend
+* is available through the `arrow` package in R
+* `dplyr` backend
 * is very fast!
 
 ### 1.2 Data Objects
@@ -58,8 +58,8 @@ Is for larger-than-memory datasets and "lazy evaulation"
 * Array and chunked array: different from arrays in R, more comparable to lists and nested lists (list of lists)
 * Record batch: tabular (column-wise), set of named arrays of the same length
   * creates schema for you according to the names of the arrays
-  * can use ```$``` or ```[[column_number]]``` to pull specific schema like in base R
-  * can use ```[]``` to pull rows and columns like in base R
+  * can use `$` or `[[column_number]]` to pull specific schema like in base R
+  * can use `[]` to pull rows and columns like in base R
 * Table: set of named chunked arrays
   * acts like a record batch
   * can concatenate (unlike a record batch)
@@ -68,7 +68,7 @@ Is for larger-than-memory datasets and "lazy evaulation"
   * can do queries with dplyr
     * Data are only loaded into memory as needed, only when a query pulls them
 
-```
+```r
 Array$create() # creating arrays
 
 chunked_array() # creating chunked arrays, equivalent to:
@@ -93,7 +93,7 @@ glimpse()
 * saves memory! 
 * See also: Feather (Arrow IPC) file format
 
-```
+```r
 read_parquet()
 write_parquet()
 
@@ -104,13 +104,13 @@ write_dataset()
 
 ## 2. Reading Data & Partitioning
 Load libraries:
-```
+```r
 library(arrow)
 library(dplyr)
 ```
 ### 2.1 Reading a Dataset
 Read in the Seattle Library dataset using Arrow:
-```
+```r
 # read.csv() is not recommended for a big dataset like this
 
 seattle_csv <- open_dataset(
@@ -127,10 +127,10 @@ class(seattle_csv)
 ```
 
 ### 2.2 Data Engineering with Partitions
-cf. ```dplyr::group_by()```
+cf. `dplyr::group_by()`
 
 #### 2.2.1 Single-Level Partitioning
-```
+```r
 # dplyr
 seattle_csv |> 
   group_by(CheckoutYear) |> 
@@ -150,7 +150,7 @@ list.files("Arrow/seattle_partitioned/CheckoutYear=2005")
 ```
 
 #### 2.2.2 Multi-Level Partitioning
-```
+```r
 write_dataset(seattle_csv,
               path = "Arrow/seattle_twice_partitioned",
               partitioning = c("CheckoutYear", "MaterialType") # top to bottom in order !
@@ -161,7 +161,7 @@ list.files("Arrow/seattle_twice_partitioned/CheckoutYear=2005")
 ```
 
 #### 2.2.3 Reading partitioned data
-```
+```r
 seattle_partitioned <- open_dataset("Arrow/seattle_twice_partitioned")
 seattle_partitioned
 
@@ -177,19 +177,19 @@ seattle_2022_BOOK
 ## 3. Benchmarking
 ### 3.1 Comparing file sizes
 Original CSV file:
-```
+```r
 file.size("Arrow/seattle-library-checkouts-tiny.csv")/1e6 # in MB
 ```
 
 Single Parquet file:
-```
+```r
 write_dataset(seattle_csv, path = "Arrow", 
               basename_template = "seattle{i}.arrow")
 file.size("Arrow/seattle0.arrow")/1e6
 ```
 
 Partitioned Parquet files:
-```
+```r
 tibble(
   files = list.files("Arrow/seattle_partitioned", recursive = TRUE),
   MB = file.size(file.path("Arrow/seattle_partitioned", 
@@ -199,7 +199,7 @@ tibble(
 
 ### 3.2 Comparing file formats
 Using the local CSV file:
-```
+```r
 seattle_readcsv <- read.csv("Arrow/seattle-library-checkouts-tiny.csv")
 
 seattle_readcsv |> 
@@ -212,7 +212,7 @@ seattle_readcsv |>
 ```
 
 Using the arrow object created from the CSV file:
-```
+```r
 seattle_csv |> 
   filter(CheckoutYear == 2021, MaterialType == "BOOK") |>
   group_by(CheckoutMonth) |>
@@ -223,7 +223,7 @@ seattle_csv |>
 ```
 
 Using the Parquet files:
-```
+```r
 seattle_partitioned |> 
   filter(CheckoutYear == 2021, MaterialType == "BOOK") |>
   group_by(CheckoutMonth) |>
@@ -234,9 +234,10 @@ seattle_partitioned |>
 ```
 
 ### 3.3 Comparing partitions
-```filter()``` in ```dplyr``` with partitioned variables:
-```
-seattle_partitioned %>%
+`filter()` in `dplyr` with partitioned variables:
+
+```r
+seattle_partitioned |>
   filter(CheckoutYear == 2019, MaterialType == "BOOK") |> 
   summarise(TotalCheckouts = sum(Checkouts)) |>
   collect() |> 
@@ -244,7 +245,7 @@ seattle_partitioned %>%
 ```
 
 Partitioned with another variable:
-```
+```r
 write_dataset(seattle_csv, 
               path = "Arrow/seattle_by_CheckoutType", 
               partitioning = "CheckoutType")
@@ -256,6 +257,6 @@ open_dataset("Arrow/seattle_by_CheckoutType") |>
   system.time()
 ```
 
-## 4.0  ```dplyr``` with Arrow: Exercises
+## 4.0  `dplyr` with Arrow: Exercises
 22.5.3 from Wickham, Centinkaya-Rundel, and Grolemund (2023)
 ### 4.1 
