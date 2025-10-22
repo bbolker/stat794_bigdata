@@ -2,6 +2,7 @@
 ## 0. Homework
 ### 0.1 Readings
 (in no particular order)
+Take a look as much as you can but it's okay if you can't get through all
 * Chapter 22 Arrow in R for Data Science: https://r4ds.hadley.nz/arrow.html
 * Arrow R Package articles
   * Data objects: https://arrow.apache.org/docs/r/articles/data_objects.html
@@ -10,6 +11,7 @@
   * Working with multi-file datasets: https://arrow.apache.org/docs/r/articles/dataset.html
   * Using docker containers: https://arrow.apache.org/docs/r/articles/developers/docker.html
   * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
+    * (Potentially) Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
 
 ### 0.2 Files/Software
