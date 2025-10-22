@@ -14,8 +14,9 @@
 
 ### 0.2 Files/Software
 * Install Arrow R Package (assuming you have dplyr, duckDB, etc.)
-* Install NYC Taxi and Seattle Library datasets (sorry...)
-```r
+* Install Seattle Library dataset (sorry...)
+  
+```
 install.packages("arrow")
 
 # tiny Seattle dataset
@@ -23,19 +24,6 @@ options(timeout = 1800)
 download.file(
   url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/seattle-library-checkouts-tiny.csv",
   destfile = "your_directory/seattle-library-checkouts-tiny.csv"
-)
-
-# tiny NYC dataset
-options(timeout = 1800)
-download.file(
-  url = "https://github.com/posit-conf-2023/arrow/releases/download/v0.1.0/nyc-taxi-tiny.zip",
-  destfile = "your_directory/nyc-taxi-tiny.zip"
-)
-
-# Extract the partitioned parquet files from the zip folder:
-unzip(
-  zipfile = "your_directory/nyc-taxi-tiny.zip", 
-  exdir = "your_directory/"
 )
 ```
 
