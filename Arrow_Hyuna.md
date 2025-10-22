@@ -1,8 +1,8 @@
 # Arrow Classes I & II
-## 0. Homework
+## 0 Homework
 ### 0.1 Readings
 (in no particular order)
-Take a look as much as you can but it's okay if you can't get through all
+Take a look as much as you can, but it's okay if you can't get through all
 * Chapter 22 Arrow in R for Data Science: https://r4ds.hadley.nz/arrow.html
 * Arrow R Package articles
   * Data objects: https://arrow.apache.org/docs/r/articles/data_objects.html
@@ -11,11 +11,11 @@ Take a look as much as you can but it's okay if you can't get through all
   * Working with multi-file datasets: https://arrow.apache.org/docs/r/articles/dataset.html
   * Using docker containers: https://arrow.apache.org/docs/r/articles/developers/docker.html
   * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
-    * (Potentially) Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
+    * (Optional) Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
 
 ### 0.2 Files/Software
-* Install Arrow R Package (assuming you have dplyr, duckDB, etc.)
+* Install Arrow R Package (assuming you have dplyr, duckDB, stringr, etc.)
 * Install Seattle Library dataset (sorry...)
   
 ```
@@ -29,7 +29,7 @@ download.file(
 )
 ```
 
-## 1. Introduction & Basics
+## 1 Introduction & Basics
 
 Is for larger-than-memory datasets and "lazy evaulation"
 
@@ -92,7 +92,7 @@ open_dataset()
 write_dataset()
 ```
 
-## 2. Reading Data & Partitioning
+## 2 Reading Data & Partitioning
 Load libraries:
 ```r
 library(arrow)
@@ -164,7 +164,8 @@ seattle_partitioned2
 seattle_2022_BOOK <- open_dataset("Arrow/seattle_twice_partitioned/CheckoutYear=2022/MaterialType=BOOK/part-0.parquet")
 seattle_2022_BOOK
 ```
-## 3. Benchmarking
+
+## 3 Benchmarking
 ### 3.1 Comparing file sizes
 Original CSV file:
 ```r
@@ -179,7 +180,7 @@ file.size("Arrow/seattle0.arrow")/1e6
 ```
 
 Partitioned Parquet files:
-```r
+```
 tibble(
   files = list.files("Arrow/seattle_partitioned", recursive = TRUE),
   MB = file.size(file.path("Arrow/seattle_partitioned", 
@@ -247,6 +248,80 @@ open_dataset("Arrow/seattle_by_CheckoutType") |>
   system.time()
 ```
 
-## 4.0  `dplyr` with Arrow: Exercises
+## 4 `dplyr` with Arrow
+### 4.1 Exercises
 22.5.3 from Wickham, Centinkaya-Rundel, and Grolemund (2023)
-### 4.1 
+```
+schema(seattle_csv)
+```
+
+1. Figure out the most popular book each year.
+```
+best_books <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
+  group_by(Title, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  # ungroup() %>%
+  # group_by(CheckoutYear) %>%
+  # filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  # arrange(desc(TotalCheckouts)) %>%
+  # head() %>%
+  collect()
+
+best_books <- best_books %>%
+  group_by(CheckoutYear) %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear)
+```
+2. Which author has the most books in the Seattle library system?
+```
+best_author <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Creator != "") %>%
+  group_by(Creator, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  collect()
+
+best_author <- best_author %>%
+  group_by(CheckoutYear) %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear)
+```
+
+3. How has checkouts of books vs ebooks changed over the last 10 years?
+```
+seattle_csv %>%
+  distinct(MaterialType) %>%
+  collect()
+
+booktype <- seattle_csv %>%
+  filter(MaterialType %in% c("BOOK", "EBOOK"),
+         CheckoutYear >= 2012) %>%
+  group_by(CheckoutYear, MaterialType)%>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  arrange(CheckoutYear) %>%
+  collect()
+
+ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
+                     color = MaterialType)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Checkouts of Books by Type: 2012-2022",
+       x = "Year", y = "Total Checkouts", color = "Material Type") +
+  scale_x_continuous(breaks = 2012:2022, labels = 2012:2022)
+```
+
+### String Manipulation with Arrow
+Author names are inconsistent (```Creator```): Some are in _First Name Last Name_ format, others are in _Last Name, First Name_ format.
+
+Fixing:
+```
+
+```
+
+### 4.2 Window Functions with Arrow
+
+## 5 ```DuckDB``` with Arrow
+
+## 6 Docker with Arrow
+
+## 7 S3 Cloud Storage
+Not to be confused with Object-Oriented S3 in R...
