@@ -261,11 +261,6 @@ best_books <- seattle_csv %>%
   filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
   group_by(Title, CheckoutYear) %>%
   summarise(TotalCheckouts = sum(Checkouts)) %>%
-  # ungroup() %>%
-  # group_by(CheckoutYear) %>%
-  # filter(TotalCheckouts == max(TotalCheckouts)) %>%
-  # arrange(desc(TotalCheckouts)) %>%
-  # head() %>%
   collect()
 
 best_books <- best_books %>%
@@ -363,7 +358,40 @@ Expression not supported in Arrow
 #### 4.3.3 A Quick ~~but not great~~ Solution
 One solution is to ```collect()```: Pull data into R first.
 
-## 5 ```DuckDB``` with Arrow
+#### 4.3.4 A Better Solution
+"Arrow supports zero-copy integration with DuckDB, and DuckDB can query Arrow datasets directly and stream query results back to Arrow. This integr\[a\]tion uses zero-copy streaming of data between DuckDB and Arrow and vice versa so that you can compose a query using both together, all the while not paying any cost to (re)serialize the data when you pass it back and forth. This is especially useful in cases where something is supported in one of Arrow or DuckDB query engines but not the other." - 7.5.2 Apache Arrow R Cookbook
+
+Toss work to ```DuckDB```!
+
+4.1 Exercises revisited:
+
+```
+best_books2 <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
+  group_by(Title, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  group_by(CheckoutYear) %>%
+  to_duckdb() %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear) %>%
+  collect()
+
+class(best_books2)
+```
+
+```
+best_author2 <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Creator != "") %>%
+  group_by(Creator, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  group_by(CheckoutYear) %>%
+  to_duckdb() %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear) %>%
+  collect()
+```
+
+## 5 DuckDB
 
 
 ## 6 Docker with Arrow
