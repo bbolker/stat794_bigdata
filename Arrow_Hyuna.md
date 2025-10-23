@@ -309,17 +309,62 @@ ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
   scale_x_continuous(breaks = 2012:2022, labels = 2012:2022)
 ```
 
-### String Manipulation with Arrow
+### 4.2 String Manipulation with Arrow
 Author names are inconsistent (```Creator```): Some are in _First Name Last Name_ format, others are in _Last Name, First Name_ format.
 
 Fixing:
 ```
+library(stringr)
 
+clean_authors <- seattle_csv %>%
+  collect() %>%
+  mutate(
+    Creator_clean = if_else(
+      str_detect(Creator, ","),
+      str_trim(str_c(
+        str_trim(str_extract(Creator, "(?<=,).*")),
+        " ",
+        str_trim(str_extract(Creator, "^[^,]+"))   
+      )),
+      Creator
+    )
+  )
+
+clean_authors %>%
+  select(Creator, Creator_clean) %>%
+  distinct() %>%
+  collect() %>%
+  head(10)
 ```
 
-### 4.2 Window Functions with Arrow
+### 4.3 Troubleshooting
+#### 4.3.1 Window Functions in Arrow
+A window function is a type of aggregation function that takes in $k$ inputs and spits out $k$ outputs, e.g., ```cumsum(), row_number(), rank(), lag()```, but not element-wise functions like ```round()```.
+
+Arrow doesn't like these ):< 
+
+Arrow doesn't like aggregate functions in general when used inside row-wise operations like ```filter()```.
+
+```
+Expression not supported in filter() in Arrow
+→ Call collect() first to pull data into R.
+```
+
+#### 4.3.2 Other Functions without Arrow Mapping
+Many functions from base R, ```lubridate, stringr, dplyr```, and ```tidyverse``` have Arrow mappings.
+
+There's many without Arrow binding, however, such as ```stringr::str_detect()``` which we tried to use above.
+
+```
+Expression not supported in Arrow
+→ Call collect() first to pull data into R.
+```
+
+#### 4.3.3 A Quick ~~but not great~~ Solution
+One solution is to ```collect()```: Pull data into R first.
 
 ## 5 ```DuckDB``` with Arrow
+
 
 ## 6 Docker with Arrow
 
