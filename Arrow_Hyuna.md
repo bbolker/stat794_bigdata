@@ -348,7 +348,7 @@ clean_authors %>%
   head(10)
 ```
 
-### 4.3 Troubleshooting
+### 4.3 Troubleshooting Arrow
 #### 4.3.1 Window Functions in Arrow
 A window function is a type of aggregation function that takes in $k$ inputs and spits out $k$ outputs, e.g., ```cumsum(), row_number(), rank(), lag()```, but not element-wise functions like ```round()```.
 
@@ -426,11 +426,212 @@ duckdb_register_arrow(con, "seattle", seattle_csv)
 ### 5.2 Working with Arrow Dataset in DuckDB
 4.1 Exercises revisited:
 
+1. Figure out the most popular book each year.
+```
+query1 <- "
+SELECT 
+  CheckoutYear,
+  Title,
+  SUM(Checkouts) AS TotalCheckouts
+FROM seattle
+WHERE MaterialType = 'BOOK' 
+  AND Title <> '<Unknown Title>'
+GROUP BY CheckoutYear, Title
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY CheckoutYear 
+  ORDER BY SUM(Checkouts) DESC
+) = 1
+ORDER BY CheckoutYear
+"
 
-### 5.3 Tossing Work Back and Forth
+best_books3 <- dbGetQuery(con, query1)
+```
 
+2. Which author has the most books in the Seattle library system?
+```
+query2 <- "
+SELECT 
+  Creator,
+  COUNT(DISTINCT Title) AS NumBooks
+FROM seattle
+WHERE MaterialType = 'BOOK'
+  AND Creator IS NOT NULL
+  AND TRIM(Creator) <> ''
+  AND Title <> '<Unknown Title>'
+GROUP BY Creator
+ORDER BY NumBooks DESC
+LIMIT 1
+"
+
+best_author2 <- dbGetQuery(con, query2)
+```
+
+3. How has checkouts of books vs ebooks changed over the last 10 years?
+```
+query3 <- "
+  SELECT
+    CheckoutYear,
+    MaterialType,
+    SUM(Checkouts) AS TotalCheckouts
+  FROM seattle
+  WHERE MaterialType IN ('BOOK', 'EBOOK')
+    AND CheckoutYear >= 2012
+  GROUP BY CheckoutYear, MaterialType
+  ORDER BY CheckoutYear
+"
+
+booktype2 <- dbGetQuery(con, query3)
+
+query4 <- "
+  SELECT
+    CheckoutYear,
+    MaterialType,
+    SUM(Checkouts) AS TotalCheckouts
+  FROM seattle
+  WHERE (MaterialType = 'BOOK' OR MaterialType = 'EBOOK')
+    AND CheckoutYear >= 2012
+  GROUP BY CheckoutYear, MaterialType
+  ORDER BY CheckoutYear
+"
+
+booktype2 <- dbGetQuery(con, query4)
+```
+
+DuckDB doesn't want to do it with the Arrow dataset ):<
+
+Solution 1: Pull from DuckDB
+```
+booktype2 <- dbGetQuery(con, "
+  SELECT CheckoutYear, MaterialType, Checkouts
+  FROM seattle
+  WHERE CheckoutYear >= 2012
+")
+
+booktype2 <- booktype2 %>%
+  filter(MaterialType %in% c("BOOK", "EBOOK")) %>%
+  group_by(CheckoutYear, MaterialType) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  arrange(CheckoutYear)
+
+booktype_plot2 <- ggplot(booktype2, aes(x=CheckoutYear, y=TotalCheckouts,
+                                      color = MaterialType)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Checkouts of Books by Type: 2012-2022",
+       x = "Year", y = "Total Checkouts", color = "Material Type") +
+  scale_x_continuous(breaks = 2012:2022, labels = 2012:2022)
+```
+
+Solution 2: Abandon Arrow
+```
+dbExecute(con, "CREATE TABLE seattle_duck AS SELECT * FROM seattle")
+
+booktype3 <- dbGetQuery(con, "
+  SELECT CheckoutYear, MaterialType, SUM(Checkouts) AS TotalCheckouts
+  FROM seattle_duck
+  WHERE MaterialType IN ('BOOK','EBOOK')
+    AND CheckoutYear >= 2012
+  GROUP BY CheckoutYear, MaterialType
+  ORDER BY CheckoutYear
+")
+
+booktype_plot3 <- ggplot(booktype3, aes(x=CheckoutYear, y=TotalCheckouts,
+                                        color = MaterialType)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Checkouts of Books by Type: 2012-2022",
+       x = "Year", y = "Total Checkouts", color = "Material Type") +
+  scale_x_continuous(breaks = 2012:2022, labels = 2012:2022)
+```
+
+### 5.3 Troubleshooting DuckDB
+
+#### 5.3.1 Custom Functions
+
+Arrow can deal with custom functions:
+```
+f_popular <- function(checkouts, ...) {
+  out <- as.character(checkouts > 500)
+}
+
+# Register in Arrow
+register_scalar_function("popular", f_popular, 
+                         in_type = int64(), out_type = string())
+
+popular_books <- seattle_csv %>%
+  filter(!is.na(Checkouts), MaterialType == "BOOK") %>%
+  group_by(Title) %>%
+  mutate(Popular = f_popular(Checkouts)) %>%
+  filter(Popular == "true") %>%
+  group_by(CheckoutYear) %>%
+  arrange(desc(Checkouts)) %>%
+  select(Title, CheckoutYear, Checkouts) %>%
+  collect()
+```
+
+DuckDB can't deal:
+```
+duck_tbl <- tbl(con, "seattle")
+
+duck_popular <- duck_tbl %>%
+  filter(!is.na(Checkouts), MaterialType == "BOOK") %>%
+  group_by(Title) %>%
+  mutate(Popular = f_popular(Checkouts)) %>%
+  filter(Popular == "true") %>%
+  group_by(CheckoutYear) %>%
+  arrange(desc(Checkouts)) %>%
+  select(Title, CheckoutYear, Checkouts) %>%
+  collect()
+```
+
+#### 5.3.2 Tossing Work
+
+You can use ```to_duckdb()``` and ```to_arrow()``` to toss commands
+
+Tossing the custom function we couldn't use to Arrow:
+```
+duck_popular_2arrow <- duck_tbl %>%
+  filter(!is.na(Checkouts), MaterialType == "BOOK") %>%
+  group_by(Title) %>%
+  to_arrow() %>%
+  mutate(Popular = f_popular(Checkouts)) %>%
+  filter(Popular == "true") %>%
+  group_by(CheckoutYear) %>%
+  arrange(desc(Checkouts)) %>%
+  select(Title, CheckoutYear, Checkouts) %>%
+  collect()
+```
+
+You can also move back and forth:
+```
+best_popular_books <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
+  group_by(Title, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  group_by(CheckoutYear) %>%
+  to_duckdb() %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  mutate(Popular = f_popular(TotalCheckouts)) %>%
+  filter(Popular == "true") %>%
+  arrange(CheckoutYear) %>%
+  collect()
+
+best_popular_books <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
+  group_by(Title, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  group_by(CheckoutYear) %>%
+  to_duckdb() %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  to_arrow() %>%
+  mutate(Popular = f_popular(TotalCheckouts)) %>%
+  filter(Popular == "true") %>%
+  arrange(CheckoutYear) %>%
+  collect()
+```
 
 ## 6 Docker with Arrow
 
 ## 7 S3 Cloud Storage
 Not to be confused with Object-Oriented S3 in R...
+
+## 8 DuckDB Revisited
+### ```duckplyr```
