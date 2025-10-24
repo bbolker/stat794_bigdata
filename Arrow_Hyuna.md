@@ -11,8 +11,12 @@ Take a look as much as you can, but it's okay if you can't get through all
   * Working with multi-file datasets: https://arrow.apache.org/docs/r/articles/dataset.html
   * Using docker containers: https://arrow.apache.org/docs/r/articles/developers/docker.html
   * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
-    * (Optional) Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
+
+#### 0.1.1 Optional Readings
+* Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
+* DuckDB documentation: https://duckdb.org/docs/stable/clients/r
+* ```duckplyr``` documentation: https://duckplyr.tidyverse.org/
 
 ### 0.2 Files/Software
 * Install Arrow R Package (assuming you have dplyr, duckDB, stringr, etc.)
@@ -363,7 +367,7 @@ One solution is to ```collect()```: Pull data into R first.
 
 Toss work to ```DuckDB```!
 
-4.1 Exercises revisited:
+4.1 Exercises 1 & 2 revisited:
 
 ```
 best_books2 <- seattle_csv %>%
