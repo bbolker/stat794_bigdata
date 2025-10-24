@@ -275,15 +275,27 @@ best_books <- best_books %>%
 2. Which author has the most books in the Seattle library system?
 ```
 best_author <- seattle_csv %>%
-  filter(MaterialType == "BOOK", Creator != "") %>%
-  group_by(Creator, CheckoutYear) %>%
-  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  filter(
+    MaterialType == "BOOK",
+    Title != "<Unknown Title>",
+    Creator != ""
+  ) %>%
+  group_by(Creator) %>%
+  summarise(NumBooks = n_distinct(Title)) %>%
+  arrange(desc(NumBooks)) %>%
+  head(1) %>%
   collect()
 
-best_author <- best_author %>%
-  group_by(CheckoutYear) %>%
-  filter(TotalCheckouts == max(TotalCheckouts)) %>%
-  arrange(CheckoutYear)
+Patterson_books <- seattle_csv %>%
+  filter(
+    MaterialType == "BOOK",
+    Title != "<Unknown Title>",
+    Creator == "Patterson, James, 1947-"
+  ) %>%
+  group_by(Title, PublicationYear, Publisher) %>%
+  summarise(TotalCheckouts = sum(Checkouts, na.rm = TRUE)) %>%
+  arrange(desc(TotalCheckouts)) %>%
+  collect()
 ```
 
 3. How has checkouts of books vs ebooks changed over the last 10 years?
@@ -300,7 +312,7 @@ booktype <- seattle_csv %>%
   arrange(CheckoutYear) %>%
   collect()
 
-ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
+booktype_plot <- ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
                      color = MaterialType)) + 
   geom_line() + geom_point() + 
   labs(title = "Checkouts of Books by Type: 2012-2022",
@@ -367,7 +379,7 @@ One solution is to ```collect()```: Pull data into R first.
 
 Toss work to ```DuckDB```!
 
-4.1 Exercises 1 & 2 revisited:
+4.1 Exercise 1 revisited:
 
 ```
 best_books2 <- seattle_csv %>%
@@ -383,19 +395,39 @@ best_books2 <- seattle_csv %>%
 class(best_books2)
 ```
 
+## 5 DuckDB with Arrow
+### 5.1 Setting Up
+
 ```
-best_author2 <- seattle_csv %>%
-  filter(MaterialType == "BOOK", Creator != "") %>%
-  group_by(Creator, CheckoutYear) %>%
-  summarise(TotalCheckouts = sum(Checkouts)) %>%
-  group_by(CheckoutYear) %>%
-  to_duckdb() %>%
-  filter(TotalCheckouts == max(TotalCheckouts)) %>%
-  arrange(CheckoutYear) %>%
-  collect()
+library(duckdb)
 ```
 
-## 5 DuckDB
+Start an in-memory database:
+```
+con <- dbConnect(duckdb())
+```
+No changes are made in-disk and your work will be lost when you exit R/disconnect DuckDB.
+
+If you have a local DuckDB, you can mount it:
+```
+con <- dbConnect(duckdb(), dbdir = "my-db.duckdb")
+```
+
+To disconnect:
+```
+dbDisconnect(con, shutdown = TRUE)
+```
+
+Load Arrow dataset to the database:
+```
+duckdb_register_arrow(con, "seattle", seattle_csv)
+```
+
+### 5.2 Working with Arrow Dataset in DuckDB
+4.1 Exercises revisited:
+
+
+### 5.3 Tossing Work Back and Forth
 
 
 ## 6 Docker with Arrow
