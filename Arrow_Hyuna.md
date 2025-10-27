@@ -1,6 +1,6 @@
-# Arrow Classes I & II
+# Arrow & Other Topics
 ## 0 Homework
-### 0.1 Readings
+### 0.1 Arrow Readings
 (in no particular order)
 Take a look as much as you can, but it's okay if you can't get through all
 * Chapter 22 Arrow in R for Data Science: https://r4ds.hadley.nz/arrow.html
@@ -10,13 +10,15 @@ Take a look as much as you can, but it's okay if you can't get through all
   * Data analysis with dplyr syntax: https://arrow.apache.org/docs/r/articles/data_wrangling.html
   * Working with multi-file datasets: https://arrow.apache.org/docs/r/articles/dataset.html
   * Using docker containers: https://arrow.apache.org/docs/r/articles/developers/docker.html
-  * Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html
+  * ~~Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html~~
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
 
 #### 0.1.1 Optional Readings
-* Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
+* ~~Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html~~
 * DuckDB documentation: https://duckdb.org/docs/stable/clients/r
 * ```duckplyr``` documentation: https://duckplyr.tidyverse.org/
+* ```data.table``` in R: https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+* Apache Spark: Luraschi, J., Kuo, K., & Ruiz, E. (2020). _Mastering Spark with R : the complete guide to large-scale analysis and modeling_ (First edition.). O’Reilly Media, Inc.
 
 ### 0.2 Files/Software
 * Install Arrow R Package (assuming you have dplyr, duckDB, stringr, etc.)
@@ -741,8 +743,9 @@ cp arrow/booktype_plot.png ./booktype_plot.png
 
 cf. See ```stevedore``` library in R.
 
-## 7 S3 Cloud Storage
-Not to be confused with Object-Oriented S3 in R...
-
-## 8 DuckDB Revisited
+## 7 DuckDB Revisited
 ### ```duckplyr```
+
+## 8 ```data.table``` in R
+
+## 9 Apache Spark
