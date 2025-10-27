@@ -629,6 +629,117 @@ best_popular_books <- seattle_csv %>%
 ```
 
 ## 6 Docker with Arrow
+In LINUX Ubuntu (commands might look slightly different if you're using the Terminal on Mac)
+
+### 6.1 Setting Up
+
+1. [Arrow has their own hub on Docker](https://hub.docker.com/r/apache/arrow-dev), where you can see the containers you can pull. I choose the latest Ubuntu container for R: "apache/arrow-dev:r-rhub-ubuntu-gcc12-latest". Pull it:
+
+```
+docker pull apache/arrow-dev:r-rhub-ubuntu-gcc12-latest
+```
+(This might take a few seconds)
+
+2. Mount my directory with the data onto the container and run it:
+
+```
+$ docker run -it -e ARROW_DEPENDENCY_SOURCE=AUTO -v "$(pwd)/Arrow":/arrow apache/arrow-dev:r-rhub-ubuntu-gcc12-latest
+
+# ls arrow
+```
+
+3. Exit Docker (turn off the container):
+
+```
+# exit
+```
+
+### 6.2 Arrow with R inside the Container
+This container supports R, so you can run R commands directly while inside the container.
+
+But weirdly it doesn't have the ```arrow``` package downloaded, so you have to install using ```install.package("arrow")```. This takes a minute, but the downloaded package gets stored in ```/tmp/RtmpDbpgYd/downloaded_packages``` inside the container. This is a temporary directory, so all gets deleted when you quit the R session unless you save the ```.RData``` file.
+
+~~I find that it's generally slower this way but I guess that's to be expected~~
+
+```
+library(arrow)
+libray(dplyr)
+
+getwd()
+setwd("arrow")
+
+seattle_csv <- open_dataset(sources = "seattle-library-checkouts-tiny.csv", col_types = schema(ISBN = string()), format = "csv")
+
+schema(seattle_csv)
+glimpse(seattle_csv)
+```
+
+Partitioning:
+
+```
+write_dataset(seattle_csv, path = "seattle_montly_partitioned", partitioning =
+ "CheckoutMonth")
+list.files("seattle_montly_partitioned")
+```
+
+Data manipulation (Exercises 1 & 3):
+
+```
+best_books <- seattle_csv %>% filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>% group_by(Title, CheckoutYear) %>% summarise(TotalCheckouts = sum(Checkouts)) %>% ungroup() %>% group_by(CheckoutYear) %>% filter(TotalCheckouts == max(TotalCheckouts)) %>% arrange(desc(TotalCheckouts)) %>% head() %>% collect()
+
+best_books <- seattle_csv %>% filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>% group_by(Title, CheckoutYear) %>% summarise(TotalCheckouts = sum(Checkouts)) %>% collect()
+
+best_books <- best_books %>% group_by(CheckoutYear) %>% filter(TotalCheckouts
+== max(TotalCheckouts)) %>% arrange(CheckoutYear)
+
+best_books
+
+best_books2 <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
+  group_by(Title, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  group_by(CheckoutYear) %>%
+  to_duckdb() %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear) %>%
+  collect()
+
+booktype <- seattle_csv %>%
+  filter(MaterialType %in% c("BOOK", "EBOOK"),
+         CheckoutYear >= 2012) %>%
+  group_by(CheckoutYear, MaterialType)%>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  arrange(CheckoutYear) %>%
+  collect()
+
+library(ggplot2)
+booktype_plot <- ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
+                     color = MaterialType)) + 
+  geom_line() + geom_point() + 
+  labs(title = "Checkouts of Books by Type: 2012-2022",
+       x = "Year", y = "Total Checkouts", color = "Material Type") +
+  scale_x_continuous(breaks = 2012:2022, labels = 2012:2022)
+
+booktype_plot
+
+png("booktype_plot.png")
+print(booktype_plot)
+dev.off()
+list.files()
+```
+
+Exit R and return to Docker:
+```
+q()
+```
+
+Copy the image file (no need for us because we've mounted our directory, which means all saved changes are on our local device as well):
+
+```
+cp arrow/booktype_plot.png ./booktype_plot.png
+```
+
+cf. See ```stevedore``` library in R.
 
 ## 7 S3 Cloud Storage
 Not to be confused with Object-Oriented S3 in R...
