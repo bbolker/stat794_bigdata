@@ -139,6 +139,7 @@ seattle_csv |> write_dataset(
   # format = c("parquet")
   partitioning = "CheckoutYear"
   # hive_style = TRUE is default, file names as column=value
+  # alternative is directory partitioning, file names just with value
   )
 
 list.files("Arrow/seattle_partitioned")
@@ -160,6 +161,7 @@ list.files("Arrow/seattle_twice_partitioned/CheckoutYear=2005")
 ```r
 seattle_partitioned <- open_dataset("Arrow/seattle_twice_partitioned")
 seattle_partitioned
+head(seattle_partitioned$files)
 
 seattle_partitioned2 <- open_dataset(
   "Arrow/seattle_twice_partitioned",
@@ -267,14 +269,36 @@ best_books <- seattle_csv %>%
   filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>%
   group_by(Title, CheckoutYear) %>%
   summarise(TotalCheckouts = sum(Checkouts)) %>%
+  # ungroup() %>%
+  # group_by(CheckoutYear) %>%
+  # filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  # arrange(CheckoutYear) %>%
+  # head() %>%
   collect()
 
 best_books <- best_books %>%
   group_by(CheckoutYear) %>%
   filter(TotalCheckouts == max(TotalCheckouts)) %>%
   arrange(CheckoutYear)
+
+class(best_books)
 ```
 2. Which author has the most books in the Seattle library system?
+
+```
+# best author each year
+best_author <- seattle_csv %>%
+  filter(MaterialType == "BOOK", Creator != "") %>%
+  group_by(Creator, CheckoutYear) %>%
+  summarise(TotalCheckouts = sum(Checkouts)) %>%
+  collect()
+
+best_author <- best_author %>%
+  group_by(CheckoutYear) %>%
+  filter(TotalCheckouts == max(TotalCheckouts)) %>%
+  arrange(CheckoutYear)
+```
+
 ```
 best_author <- seattle_csv %>%
   filter(
@@ -314,6 +338,7 @@ booktype <- seattle_csv %>%
   arrange(CheckoutYear) %>%
   collect()
 
+library(ggplot2)
 booktype_plot <- ggplot(booktype, aes(x=CheckoutYear, y=TotalCheckouts,
                      color = MaterialType)) + 
   geom_line() + geom_point() + 
@@ -330,24 +355,30 @@ Fixing:
 library(stringr)
 
 clean_authors <- seattle_csv %>%
-  collect() %>%
+  # collect() %>%
   mutate(
     Creator_clean = if_else(
       str_detect(Creator, ","),
       str_trim(str_c(
         str_trim(str_extract(Creator, "(?<=,).*")),
-        " ",
-        str_trim(str_extract(Creator, "^[^,]+"))   
+        # after comma: first name
+        # (?<=,) positive look behind: current position immediately after comma
+        # .* any number of characters
+        " ", # space between first and last names
+        str_trim(str_extract(Creator, "^[^,]+"))
+        # start from the beginning (^) and include everything up to but excluding the first comma
+        # + for however many characters
       )),
       Creator
     )
   )
 
+# Show changes
 clean_authors %>%
   select(Creator, Creator_clean) %>%
   distinct() %>%
   collect() %>%
-  head(10)
+  head(20)
 ```
 
 ### 4.3 Troubleshooting Arrow
@@ -555,6 +586,7 @@ f_popular <- function(checkouts, ...) {
 }
 
 # Register in Arrow
+# works without it
 register_scalar_function("popular", f_popular, 
                          in_type = int64(), out_type = string())
 
@@ -572,6 +604,7 @@ popular_books <- seattle_csv %>%
 DuckDB can't deal:
 ```
 duck_tbl <- tbl(con, "seattle")
+class(duck_tbl)
 
 duck_popular <- duck_tbl %>%
   filter(!is.na(Checkouts), MaterialType == "BOOK") %>%
@@ -600,6 +633,8 @@ duck_popular_2arrow <- duck_tbl %>%
   arrange(desc(Checkouts)) %>%
   select(Title, CheckoutYear, Checkouts) %>%
   collect()
+
+class(duck_popular_2arrow)
 ```
 
 You can also move back and forth:
@@ -609,7 +644,6 @@ best_popular_books <- seattle_csv %>%
   group_by(Title, CheckoutYear) %>%
   summarise(TotalCheckouts = sum(Checkouts)) %>%
   group_by(CheckoutYear) %>%
-  to_duckdb() %>%
   filter(TotalCheckouts == max(TotalCheckouts)) %>%
   mutate(Popular = f_popular(TotalCheckouts)) %>%
   filter(Popular == "true") %>%
@@ -628,6 +662,8 @@ best_popular_books <- seattle_csv %>%
   filter(Popular == "true") %>%
   arrange(CheckoutYear) %>%
   collect()
+
+class(best_popular_books)
 ```
 
 ## 6 Docker with Arrow
@@ -669,6 +705,7 @@ libray(dplyr)
 
 getwd()
 setwd("arrow")
+list.files(getwd())
 
 seattle_csv <- open_dataset(sources = "seattle-library-checkouts-tiny.csv", col_types = schema(ISBN = string()), format = "csv")
 
@@ -687,7 +724,7 @@ list.files("seattle_montly_partitioned")
 Data manipulation (Exercises 1 & 3):
 
 ```
-best_books <- seattle_csv %>% filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>% group_by(Title, CheckoutYear) %>% summarise(TotalCheckouts = sum(Checkouts)) %>% ungroup() %>% group_by(CheckoutYear) %>% filter(TotalCheckouts == max(TotalCheckouts)) %>% arrange(desc(TotalCheckouts)) %>% head() %>% collect()
+best_books <- seattle_csv %>% filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>% group_by(Title, CheckoutYear) %>% summarise(TotalCheckouts = sum(Checkouts)) %>% ungroup() %>% group_by(CheckoutYear) %>% filter(TotalCheckouts == max(TotalCheckouts)) %>% arrange(CheckoutYear) %>% collect()
 
 best_books <- seattle_csv %>% filter(MaterialType == "BOOK", Title != "<Unknown Title>") %>% group_by(Title, CheckoutYear) %>% summarise(TotalCheckouts = sum(Checkouts)) %>% collect()
 
@@ -743,8 +780,10 @@ cp arrow/booktype_plot.png ./booktype_plot.png
 
 cf. See ```stevedore``` library in R.
 
-## 7 DuckDB Revisited
-### ```duckplyr```
+## 7 DuckDB Revisited: ```duckplyr```
+Essentially same as ```dplyr```, but uses DuckDB in the back-end where possible to speed up computation. 
+
+You can analyze larger-than-memory datasets from your disk or from the web.
 
 ## 8 ```data.table``` in R
 
