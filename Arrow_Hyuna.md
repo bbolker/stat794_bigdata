@@ -701,7 +701,7 @@ But weirdly it doesn't have the ```arrow``` package downloaded, so you have to i
 
 ```
 library(arrow)
-libray(dplyr)
+library(dplyr)
 
 getwd()
 setwd("arrow")
