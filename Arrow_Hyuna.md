@@ -1,4 +1,4 @@
-# Arrow & Other Topics
+# Arrow & Other Topic
 ## 0 Homework
 ### 0.1 Arrow Readings
 (in no particular order)
@@ -779,12 +779,3 @@ cp arrow/booktype_plot.png ./booktype_plot.png
 ```
 
 cf. See ```stevedore``` library in R.
-
-## 7 DuckDB Revisited: ```duckplyr```
-Essentially same as ```dplyr```, but uses DuckDB in the back-end where possible to speed up computation. 
-
-You can analyze larger-than-memory datasets from your disk or from the web.
-
-## 8 ```data.table``` in R
-
-## 9 Apache Spark
