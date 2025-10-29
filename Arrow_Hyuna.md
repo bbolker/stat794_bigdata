@@ -16,7 +16,7 @@ Take a look as much as you can, but it's okay if you can't get through all
 #### 0.1.1 Optional Readings
 * ~~Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html~~
 * DuckDB documentation: https://duckdb.org/docs/stable/clients/r
-* ```duckplyr``` documentation: https://duckplyr.tidyverse.org/
+* Articles in ```duckplyr``` documentation: https://duckplyr.tidyverse.org/
 * ```data.table``` in R: https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
 * Apache Spark: Luraschi, J., Kuo, K., & Ruiz, E. (2020). _Mastering Spark with R : the complete guide to large-scale analysis and modeling_ (First edition.). O’Reilly Media, Inc.
 
