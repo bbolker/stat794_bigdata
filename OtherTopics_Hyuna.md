@@ -197,6 +197,10 @@ read_parquet_duckdb(
 #### 7.2.3 Fallback
 When a command is not supported in ```duckplyr```, it'll automatically fall back to the original ```dplyr``` implementation.
 
+```
+?unsupported
+```
+
 Masking/restoring:
 ```
 conflicted::conflict_prefer("filter", "dplyr")
@@ -225,7 +229,80 @@ flights_df() %>% as_duckdb_tibble(prudence = "lavish") |>
   summarize(n = n()) 
 ```
 
-#### 7.2.4 Custom Functions
+#### 7.2.4 Things to Be Careful About
+Known Incompatibilities between ```duckplyr``` and ```dplyr```
+
+##### 7.2.4.1 Output Order Stability
+DuckDB (and therefore ```duckplyr```) does not guarantee order stability for the output.
+
+```
+flights_duck %>% distinct(day) %>%
+  summarise(paste(day, collapse = " "))
+```
+
+You can set in environment ```DUCKPLYR_OUTPUT_ORDER = "TRUE"``` to fix this:
+```
+withr::with_envvar(
+  c(DUCKPLYR_OUTPUT_ORDER = "TRUE"),
+  flights_duck %>% distinct(day) %>%
+    summarise(paste(day, collapse = " "))
+  )
+```
+
+cf.
+```
+?config
+
+Sys.setenv(DUCKPLYR_FORCE = FALSE)
+```
+
+##### 7.2.4.2 Empty Objects
+
+Zero-column tibbles are not supported:
+
+```
+# as input
+x <- duckdb_tibble()
+
+# as output
+duckdb_tibble(a = 1) |>
+  select(-a)
+```
+
+Empty vectors in aggregate functions also work differently in ```duckplyr``` than in ```dplyr```:
+
+```
+duckdb_tibble(a = integer(), b = logical()) |>
+  summarize(sum(a), any(b), all(b), min(a), max(a))
+
+detach("package:duckplyr", unload = TRUE)
+tibble(a = integer(), b = logical()) |>
+  summarize(sum(a), any(b), all(b), min(a), max(a))
+```
+
+##### 7.2.4.3 Logical Inputs
+```
+duckdb_tibble(a = c(TRUE, FALSE)) |>
+  summarize(min(a), max(a))
+
+detach("package:duckplyr", unload = TRUE)
+tibble(a = c(TRUE, FALSE)) |>
+  summarize(min(a), max(a))
+```
+
+##### 7.2.4.4 ```NA, NaN```
+```dplyr``` treats ```NA``` and ```NaN``` both like null values--- ```duckplyr``` doesn't.
+
+```
+duckdb_tibble(a = c(NA, NaN)) |>
+  mutate(is.na(a))
+
+detach("package:duckplyr", unload = TRUE)
+tibble(a = c(NA, NaN)) |>
+  mutate(is.na(a))
+```
+
+#### 7.2.5 Custom Functions
 
 ```duckplyr``` can't handle custom functions with a side effect, i.e., custom functions that spits out a return object and also interacts with an external object/program.
 
@@ -247,8 +324,7 @@ last_rel() # only the arranging was done by duckplyr
 # DuckDB finishes the last bit of computation left over
 ```
 
-#### 7.2.5 Translations
-
+For more examples of troubleshooting ```duckplyr```, see https://duckplyr.tidyverse.org/articles/limits.html.
 
 ## 8 ```data.table``` in R
 
