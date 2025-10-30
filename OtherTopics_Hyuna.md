@@ -326,6 +326,30 @@ last_rel() # only the arranging was done by duckplyr
 
 For more examples of troubleshooting ```duckplyr```, see https://duckplyr.tidyverse.org/articles/limits.html.
 
+### 7.3 SQL through ```duckplyr```
+
+Zero-copy to ```dbplyr``` --> ```dplyr``` passthrough for SQL
+
+Converting duckplyr frame into a dbplyr ```tbl``` object:
+```
+flights_tbl <- as_tbl(flights_duck)
+flights_tbl
+class(flights_tbl)
+
+flights_km <- flights_tbl %>%
+  select(distance, month, day) %>%
+  mutate(dist_km = sql("distance * 1.60934"), 
+         moxday = least_common_multiple(month, day)) %>%
+  arrange(desc(dist_km)) %>%
+  show_query()
+  # head()
+
+flights_km
+class(flights_km)
+flights_km |> as_duckdb_tibble() |> class()
+```
+
 ## 8 ```data.table``` in R
+
 
 ## 9 Apache Spark
