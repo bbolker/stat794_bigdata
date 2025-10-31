@@ -350,6 +350,62 @@ flights_km |> as_duckdb_tibble() |> class()
 ```
 
 ## 8 ```data.table``` in R
+R's data frame but better
 
+Allows you to do "related operations" (e.g., subset, group, update, join) much faster and easier
 
-## 9 Apache Spark
+### 8.1 Introduction
+
+#### 8.1.1 Reading in data
+```
+seattle_dt <- fread("Arrow/seattle-library-checkouts-tiny.csv")
+class(seattle_dt)
+str(seattle_dt)
+head(seattle_dt$Title)
+
+setDT() # dataframe or list
+as.data.frame() # other types of objects
+```
+
+```fread()``` also supports https URLs and automatically decompresses .gz and .bz2 files (even when you're pulling them from the web).
+
+#### 8.1.2 "Querying" Data Tables
+
+DT[i, j, by]
+
+R:                 i                 j        by
+SQL:  where | order by   select | update  group by
+
+This allows R to optimize the queries before evaluating.
+
+* Subsetting
+```
+# You can refer to columns like variables
+seattle_dt[CheckoutYear == 2020 & MaterialType == "BOOK"] |>
+  head()
+
+# indexing still works
+seattle_dt[1:3]
+
+seattle_dt[1:3, Creator]
+seattle_dt[,Creator] |> head() # vector form
+seattle_dt[,list(Creator)] |> head() # data table form
+seattle_dt[, .(Creator, Checkouts)] |> head()
+```
+
+* Sorting
+```
+seattle_dt[order(CheckoutYear, -CheckoutMonth)] |> head()
+```
+
+* Column operations
+```
+# renaming (for this output only, original object is intact)
+seattle_dt[, .(creator = Creator, checkouts = Checkouts)]
+
+# computing
+seattle_dt[, sum(Checkouts > 100)]
+seattle_dt[CheckoutYear == 2020 & MaterialType == "BOOK",
+           .(book_checkouts = sum(Checkouts), 
+             median_checkouts = median(Checkouts))]
+``` 
