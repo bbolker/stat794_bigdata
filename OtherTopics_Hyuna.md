@@ -373,8 +373,14 @@ as.data.frame() # other types of objects
 
 DT[i, j, by]
 
-R:                 i                 j        by
-SQL:  where | order by   select | update  group by
+R: i
+SQL: where | order by
+
+R: j
+SQL: select | update  
+
+R: by
+SQL: group by
 
 This allows R to optimize the queries before evaluating.
 
@@ -390,7 +396,18 @@ seattle_dt[1:3]
 seattle_dt[1:3, Creator]
 seattle_dt[,Creator] |> head() # vector form
 seattle_dt[,list(Creator)] |> head() # data table form
+seattle_dt[, c("Creator", "Checkouts")] |> head()
 seattle_dt[, .(Creator, Checkouts)] |> head()
+cols <- c("Creator", "Checkouts")
+seattle_dt[, ..cols] |> head()
+
+seattle_dt[, !c("Creator", "Checkouts")] |> head()
+seattle_dt[, -c("Creator", "Checkouts")] |> head()
+
+seattle_dt[, MaterialType:Checkouts]
+seattle_dt[, Checkouts:MaterialType]
+seattle_dt[, -(MaterialType:Checkouts)]
+seattle_dt[, !(MaterialType:Checkouts)]
 ```
 
 * Sorting
@@ -409,3 +426,68 @@ seattle_dt[CheckoutYear == 2020 & MaterialType == "BOOK",
            .(book_checkouts = sum(Checkouts), 
              median_checkouts = median(Checkouts))]
 ``` 
+
+* Keys
+```setkeyv``` sorts the data by the given column(s) in ascending order. This makes operations like searches, joins, groupings, and subsetting faster.
+ 
+```
+setkey(seattle_dt, "MaterialType")
+
+seattle_dt["BOOK"] # subsetting
+seattle_dt["NETFLIX"] # right join with NA values
+seattle_dt[MaterialType == "NETFLIX"] # subsetting
+```
+
+* ```.N```
+: number of observations in the current group
+
+```
+seattle_dt[MaterialType == "BOOK", .N]
+seattle_dt["BOOK", .N]
+
+seattle_dt["BOOK", .N] |> system.time()
+nrow(seattle_dt[MaterialType == "BOOK"]) |> system.time()
+```
+
+* Aggregations
+```
+seattle_dt["BOOK",.N, by = CheckoutYear]
+# dropping MaterialType == because we set key earlier
+seattle_dt["BOOK",.N, CheckoutYear]
+
+seattle_dt["BOOK",.N, by = .(CheckoutYear, CheckoutMonth)]
+
+seattle_dt["BOOK",
+           .(mean_checkout = mean(Checkouts),
+             monthly_checkouts = sum(Checkouts)),
+           .(CheckoutYear, CheckoutMonth)][
+             order(CheckoutYear, -CheckoutMonth)
+           ] # chaining can go on forever
+
+seattle_dt[, .N, .(Checkouts > 50, CheckoutYear < 2020)]
+```
+
+* ```.SD```
+stands for Subset of Data
+
+```
+DT <- data.table(
+  ID = c("b","b","b","a","a","c"),
+  a = 1:6,
+  b = 7:12,
+  c = 13:18
+)
+
+DT[, print(.SD), by = ID]
+DT[, lapply(.SD, mean), ID]
+DT[, lapply(.SD, mean), keyby = ID]
+
+seattle_dt["BOOK",
+           lapply(.SD, sum),
+           .(CheckoutYear, CheckoutMonth),
+           .SDcols = "Checkouts"]
+seattle_dt[, head(.SD, 2), CheckoutYear, .SDcols = "Creator"]
+```
+
+### 8.2 "By Reference"
+```:=``` operation and zero-copy
