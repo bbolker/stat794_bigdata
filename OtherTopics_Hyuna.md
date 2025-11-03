@@ -430,17 +430,6 @@ seattle_dt[CheckoutYear == 2020 & MaterialType == "BOOK",
              median_checkouts = median(Checkouts))]
 ``` 
 
-* Keys
-```setkeyv``` sorts the data by the given column(s) in ascending order. This makes operations like searches, joins, groupings, and subsetting faster.
- 
-```
-setkey(seattle_dt, "MaterialType")
-
-seattle_dt["BOOK"] # subsetting
-seattle_dt["NETFLIX"] # right join with NA values
-seattle_dt[MaterialType == "NETFLIX"] # subsetting
-```
-
 * ```.N```
 : number of observations in the current group
 
@@ -571,3 +560,117 @@ head(flights_dt)
 However, ```copy()``` "deep" copies the data (i.e., copies entire data somewhere else in memory as opposed to "shallow" copying which only copies the vector of column points and not the actual data), so this may not always be best-practice.
 
 ## 8.3 Keys
+: supercharged rownames
+
+Setting a key
+* reorders the rows by the column(s) in ascending order by reference
+  * This is why ```keyby = ``` orders the datatable
+* assigns "sorted" attribute to the key column(s)
+* makes operations like searches, joins, groupings, and subsetting faster
+  * Binary searches are especially fast
+ 
+```
+setkey(flights_dt, origin)
+# setkeyv(seattle_dt, c("origin", "dest"))
+# particularly useful while designing functions to pass columns to set key on as function arguments
+
+seattle_dt["JFK"] # subsetting
+seattle_dt["LAX"] # right join with NA values
+seattle_dt[origin == "LAX"] # subsetting
+
+setkey(flights_dt, origin, dest) # keys are ordered
+flights_dt[.("JFK", "MSY")]
+flights_dt[.(unique(origin), "MSY")]
+
+flights_dt[.("LGA", "BOS"), max(arr_delay)]
+```
+
+Making changes in the key column removes its key status:
+```
+setkey(flights_dt, hour)
+key(flights_dt)
+flights_dt[.(24), hour := 0L]
+key(flights_dt)
+```
+
+```keyby``` option:
+```
+setkey(flights_dt, origin, dest)
+monthly_delay <- flights_dt["EWR", max(dep_delay), keyby = month]
+key(monthly_delay)
+```
+
+### 8.3.1 Benchmarking
+```
+n <- 1e7L
+DT <- data.table(x = sample(letters, n, replace = TRUE),
+                 y = sample(1000L, n, replace = TRUE),
+                 val = runif(n))
+
+# vector scan approach
+# O(n)
+system.time(DT[x == "h" & y == 218L])
+
+# binary scan approach (i.e., bisection)
+# O(log n)
+setkey(DT, x, y)
+system.time(DT[.("h", 218L)]) 
+```
+
+### 8.3.2 ```mult``` and ```nomatch```
+```
+flights_dt[.("JFK", "PSP"), mult = "first"]
+flights_dt[.(c("LGA", "JFK", "EWR"), "PSP"), mult = "last"]
+flights_dt[.(c("LGA", "JFK", "EWR"), "PSP"), mult = "last", nomatch = NULL]
+```
+
+## 8.4 Secondary Indices
+Keys are great, but sometimes you might want more than one key and/or not necessarily want the datatable reordered. And removing the keys doesn't undo the ordering.
+
+Secondary indexing instead creates an internal attribute called "index".
+
+```
+# reset data
+setindex(flights_dt, origin)
+# setindexv(flights_dt, "origin")
+
+head(flights_dt)
+names(attributes(flights_dt))
+indices(flights_dt)
+
+setindex(flights_dt, dest)
+indices(flights_dt)
+
+flights_dt["MIA", on = "dest", verbose = TRUE] 
+flights_dt[.("JFK", "MIA"), on = c("origin", "dest")]
+flights_dt[.("JFK", "MIA"), max(arr_delay), on = c("origin", "dest")] 
+flights_dt[.("JFK", "MIA"), on = c("origin", "dest")][order(-arr_delay)]
+
+# on argument need not be an index
+flights_dt[.(24L), hour := 0L, on = "hour"]
+flights_dt[, sort(unique(hour))]
+```
+
+Combined with ```key, mult, nomatch```:
+```
+flights_dt["JFK", max(dep_delay), keyby = month, on = "origin"]
+flights_dt[c("JFK", "EWR", "LGA"), on = "dest", mult = "first", nomatch = NULL]
+```
+
+#### 8.4.1 Automatic Indexing
+R will automatically create an index attribute the first time you try to binary-search without an index or a key:
+```
+DT <- data.table(x = sample(1000L, n, replace = TRUE),
+                 y = runif(n))
+names(attributes(DT))
+
+system.time(DT[x == 529])
+names(attributes(DT))
+indices(DT)
+system.time(DT[x == 529])
+system.time(DT[x %in% 520:529])
+
+options(datatable.auto.index = FALSE)
+```
+
+## 8.5 Joins
