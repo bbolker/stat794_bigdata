@@ -674,3 +674,74 @@ options(datatable.auto.index = FALSE)
 ```
 
 ## 8.5 Joins
+Setting up toy datasets:
+```
+Products <- data.table(
+  id = c(1:4,
+         NA_integer_),
+  name = c("banana",
+           "carrots",
+           "popcorn",
+           "soda",
+           "toothpaste"),
+  price = c(0.63,
+            0.89,
+            2.99,
+            1.49,
+            2.99),
+  unit = c("unit",
+           "lb",
+           "unit",
+           "ounce",
+           "unit"),
+  type = c(rep("natural", 2L),
+           rep("processed", 3L))
+)
+
+NewTax <- data.table(
+  unit = c("unit","ounce"),
+  type = "processed",
+  tax_prop = c(0.65, 0.20)
+)
+
+ProductReceived <- data.table(
+  id = 1:10,
+  date = seq(from = as.IDate("2024-01-08"), length.out = 10L, by = "week"),
+  product_id = sample(c(NA_integer_, 1:3, 6L), size = 10L, replace = TRUE),
+  count = sample(c(50L, 100L, 150L), size = 10L, replace = TRUE)
+)
+
+sample_date <- function(from, to, size, ...){
+  all_days = seq(from = from, to = to, by = "day")
+  weekdays = all_days[wday(all_days) %in% 2:6]
+  days_sample = sample(weekdays, size, ...)
+  days_sample_desc = sort(days_sample)
+  days_sample_desc
+}
+
+ProductSales <- data.table(
+  id = 1:10,
+  date = ProductReceived[, sample_date(min(date), max(date), 10L)],
+  product_id = sample(c(1:3, 7L), size = 10L, replace = TRUE),
+  count = sample(c(50L, 100L, 150L), size = 10L, replace = TRUE)
+)
+```
+
+x[i, on, nomatch]
+
+| |  |   |
+
+| |  |   \__ If ```NULL``` only returns rows linked in ```x``` and ```i``` tables
+
+| |  \____ a character vector or list defining match logic
+
+| \_____ primary datatable, list or dataframe
+
+\____ secondary datatable
+
+### 8.5.1 Equi-Join
+#### 8.5.1.1 Right Join
+: keeping all rows present in the table located on the right
+
+
+
