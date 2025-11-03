@@ -12,6 +12,7 @@ Take a look as much as you can, but it's okay if you can't get through all
   * Using docker containers: https://arrow.apache.org/docs/r/articles/developers/docker.html
   * ~~Using cloud storage: https://arrow.apache.org/docs/r/articles/fs.html~~
 * Apache Arrow R Cookbook (skip Chapter 8): https://arrow.apache.org/cookbook/r/index.html
+* Danielle Navarro Blog: https://blog.djnavarro.net/posts/2022-01-18_binding-arrow-to-r/
 
 #### 0.1.1 Optional Readings
 * ~~Amazon S3 Userguide: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html~~
@@ -426,6 +427,52 @@ best_books2 <- seattle_csv %>%
   collect()
 
 class(best_books2)
+```
+
+#### 4.3.3 Arrow Expressions and Functions
+
+cf. ```quote()``` and ```eval()``` in R
+```
+head_quote <- quote(glimpse(seattle_csv))
+head_quote
+eval(head_quote)
+```
+
+Arrow falling back on ```dplyr``` ~~???~~:
+```
+options(arrow.debug = TRUE)
+
+seattle_csv %>% 
+  select(Title, CheckoutYear, CheckoutMonth) %>%
+  mutate(
+    TITLE = toupper(Title),
+    leap = lubridate::leap_year(
+      as.Date(paste0(CheckoutYear, "-", CheckoutMonth, "-01"))
+    )
+  ) %>% 
+  collect()
+```
+
+Define Arrow expressions:
+```
+arrow_toupper <- function(Title) {
+  Expression$create("utf8_upper", Title)
+}
+
+arrow_leap_year <- function(CheckoutYear) {
+  year <- Expression$create("year", CheckoutYear)
+  (year %% 4 == 0) & ((year %% 100 != 0) | (year %% 400 == 0))
+}
+
+seattle_csv %>% 
+  select(Title, CheckoutYear, CheckoutMonth) %>%
+  mutate(
+    TITLE = arrow_toupper(Title),
+    leap = arrow_leap_year(
+      as.Date(paste0(CheckoutYear, "-", CheckoutMonth, "-01"))
+    )
+  ) %>% 
+  collect()
 ```
 
 ## 5 DuckDB with Arrow
