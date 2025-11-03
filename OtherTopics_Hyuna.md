@@ -46,7 +46,7 @@ delay_df <- flights_duck %>%
 
 #### 7.1.3 Data from DuckDB
 
-Attach existing database first:
+Attach existing database first (not run):
 ```
 library(DBI)
 library(duckdb)
@@ -350,7 +350,7 @@ flights_km |> as_duckdb_tibble() |> class()
 ```
 
 ## 8 ```data.table``` in R
-R's data frame but better
+R's dataframe but better
 
 Allows you to do "related operations" (e.g., subset, group, update, join) much faster and easier
 
@@ -374,12 +374,15 @@ as.data.frame() # other types of objects
 DT[i, j, by]
 
 R: i
+
 SQL: where | order by
 
 R: j
+
 SQL: select | update  
 
 R: by
+
 SQL: group by
 
 This allows R to optimize the queries before evaluating.
@@ -480,7 +483,7 @@ DT <- data.table(
 
 DT[, print(.SD), by = ID]
 DT[, lapply(.SD, mean), ID]
-DT[, lapply(.SD, mean), keyby = ID]
+DT[, lapply(.SD, mean), keyby = ID] # sorted
 
 seattle_dt["BOOK",
            lapply(.SD, sum),
@@ -491,3 +494,80 @@ seattle_dt[, head(.SD, 2), CheckoutYear, .SDcols = "Creator"]
 
 ### 8.2 "By Reference"
 ```:=``` operation and zero-copy
+
+Flights Dataset:
+```
+flights_dt <- fread("https://raw.githubusercontent.com/Rdatatable/data.table/master/vignettes/flights14.csv")
+```
+
+Adding columns:
+```
+flights_dt[, `:=`(speed = distance / (air_time/60), # mph
+                  delay = arr_delay + dep_delay)] # min
+# same as
+flights_dt[, c("speed", "delay") 
+        := list(distance/(air_time/60), 
+                arr_delay + dep_delay)]
+
+head(flights_dt)
+```
+
+Updating/replacing:
+```
+flights_dt[, sort(unique(hour))]
+flights_dt[hour == 24L, hour := 0L][]
+flights_dt[, sort(unique(hour))]
+
+flights_dt[hour == 24L][, hour := 0L]
+head(flights_dt)
+midnight_zero <- flights_dt[hour == 24L][, hour := 0L]
+nrow(midnight_zero)
+flights_dt[hour == 24L, .N]
+```
+
+Deleting columns:
+```
+flights_dt[, c("year") := NULL] |> head()
+
+# clean up for later
+flights_dt[, c("speed", "max_speed", "max_dep_delay", "max_arr_delay") := NULL]
+```
+
+Grouping with ```:=```:
+```
+flights_dt[, max_speed := max(speed), by = .(origin, dest)] |> head()
+```
+
+```.SD``` like a function:
+```
+in_cols  = c("dep_delay", "arr_delay")
+out_cols = c("max_dep_delay", "max_arr_delay")
+flights_dt[, c(out_cols) := lapply(.SD, max), 
+           by = month, .SDcols = in_cols]
+# out_cols needs to be wrapped in () or c() because there are more than one
+
+flights_dt[, names(.SD) := lapply(.SD, as.factor), .SDcols = is.character]
+str(flights_dt)
+# undo
+flights_dt[, names(.SD) := lapply(.SD, as.character), .SDcols = factor_cols]
+```
+
+#### 8.2.1 ```copy()```
+```:=``` makes changes to the datatable silently, which might not always be what you want.
+
+```
+monthly_speed_f <- function(DT) {
+  # copy(DT)
+  DT[, speed := distance / (air_time/60)] 
+  DT[, .(max_speed = max(speed)), by = month]
+}
+
+monthly_speed <- monthly_speed_f(flights_dt)
+monthly_speed
+head(flights_dt)
+# flights_dt[, speed := NULL]
+```
+
+However, ```copy()``` "deep" copies the data (i.e., copies entire data somewhere else in memory as opposed to "shallow" copying which only copies the vector of column points and not the actual data), so this may not always be best-practice.
+
+## 8.3 Keys
