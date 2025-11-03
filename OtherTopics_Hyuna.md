@@ -725,23 +725,188 @@ ProductSales <- data.table(
   product_id = sample(c(1:3, 7L), size = 10L, replace = TRUE),
   count = sample(c(50L, 100L, 150L), size = 10L, replace = TRUE)
 )
+
+ProductPriceHistory <- data.table(
+  product_id = rep(1:2, each = 3),
+  date = rep(as.IDate(c("2024-01-01", "2024-02-01", "2024-03-01")), 2),
+  price = c(0.59, 0.63, 0.65, 
+            0.79, 0.89, 0.99)  
+)
 ```
 
-x[i, on, nomatch]
+x[i, j, by, on, nomatch]
 
-| |  |   |
+x: secondary datatable
 
-| |  |   \__ If ```NULL``` only returns rows linked in ```x``` and ```i``` tables
-
-| |  \____ a character vector or list defining match logic
-
-| \_____ primary datatable, list or dataframe
-
-\____ secondary datatable
+i: primary datatable, list or dataframe
 
 ### 8.5.1 Equi-Join
 #### 8.5.1.1 Right Join
-: keeping all rows present in the table located on the right
+: keeping all rows present in the table located on the right ~~(adding columns of the left-table to the rows of the right-table ??)~~
 
+```
+Products[ProductReceived, on = c(id = "product_id")]
+# id from the Products table matches the product_id from the ProductReceived table
 
+NewTax[Products, on = c("unit", "type")] # multiple columns to match
 
+# managing names
+Products[
+  ProductReceived,
+  on = c("id" = "product_id"),
+  j = .(product_id = x.id,
+        name = x.name,
+        received_id = i.id,
+        date = i.date,
+        price,
+        count,
+        total_value = price * count)
+]
+
+# grouping with by =
+ProductReceived[
+  Products,
+  on = c("product_id" = "id"),
+  by = .EACHI, # grouping by each row of the right-table
+  j = .(total_value_received  = sum(price * count))
+]
+
+# same as
+ProductReceived[
+  Products,
+  on = c("product_id" = "id"),
+][, .(total_value_received  = sum(price * count)),
+  by = "product_id"
+] # with chaining
+```
+
+If there's any name conflict, prefix ```i.``` gets added to the columns of the right-table.
+
+Chaining is not recommended because passing to the ```j``` argument is faster and more memory-efficient.
+
+#### 8.5.1.2 Natural Join
+: joining based on common columns
+
+```
+ProductsNew <- setnames(copy(Products), "id", "product_id")
+ProductsNew[ProductReceived, on = .NATURAL]
+```
+
+#### 8.5.1.3 Keyed Join
+: joining based on keys of each table
+
+Results will be sorted according to the keys.
+
+```
+ProductsK <- setkey(copy(Products), id)
+ProductReceivedK <- setkey(copy(ProductReceived), product_id)
+
+ProductsK[ProductReceivedK]
+```
+
+#### 8.5.1.4 Inner Join
+: only keeping rows matched in both tables
+
+```
+Products[ProductReceived,
+         on = c("id" = "product_id"),
+         nomatch = NULL] # this makes it inner join
+```
+
+#### 8.5.1.5 Not join
+: extract from the first table rows that do not match with any row in the second table without combining columns
+
+```
+Products[!ProductReceived, # negate second table to make it a not-join
+         on = c("id" = "product_id")]
+```
+
+#### 8.5.1.6 Semi Join
+: extract from the first table rows that match any row in the second table without combining columns
+
+You need to inner-join first to get the matching row numbers, then subset:
+```
+# inner-join first to get row numbers
+which_rows <- Products[
+  ProductReceived,
+  on = .(id = product_id),
+  nomatch = NULL,
+  which = TRUE # save the row numbers (from Products) of the matching rows
+]
+
+# subset
+Products[sort(unique(which_rows))]
+```
+
+#### 8.5.1.7 Left Join
+: keeping all rows present in the table located on the left
+
+Just switch the order of the Tables...
+
+#### 8.5.1.8 Many-to-Many Join
+: joining tables based on columns with duplicate values
+
+```
+ProductReceived[product_id == 1L]
+ProductSales[product_id == 1L]
+
+ProductReceived[ProductSales[list(1L), # subsetting first
+                             on = "product_id",
+                             nomatch = NULL],
+                on = "product_id",
+                allow.cartesian = TRUE] # combining each row from one table to every row from the other 
+
+ProductReceived[ProductSales,
+                on = "product_id",
+                allow.cartesian = TRUE]
+```
+
+You have to be careful since this can explode quickly when joining two large tables--- nrow(first_table)*nrow(second_table). Subset wisely:
+
+```
+ProductReceived[ProductSales[product_id == 1L],
+                on = .(product_id),
+                allow.cartesian = TRUE,
+                mult = "first"] # or "last"
+```
+
+#### 8.5.1.9 Full Join
+: combining columns without removing any row
+
+```
+merge(x = Products,
+      y = ProductReceived,
+      by.x = "id",
+      by.y = "product_id",
+      all = TRUE,
+      sort = FALSE)
+```
+
+### 8.5.2 Non-Equi Join
+: joins not based on exact matches but comparisons, e.g., <, >
+
+```
+ProductSales2 <- ProductSales[product_id == 2L]
+ProductReceived2 <- ProductReceived[product_id == 2L]
+
+ProductReceived2[ProductSales2,
+                     on = "product_id",
+                     allow.cartesian = TRUE
+][date < i.date]
+
+ProductReceived2[ProductSales2,
+                     on = list(product_id, date < date), # received before sold
+                     nomatch = NULL]
+```
+
+### 8.5.3 Rolling Join
+: joining based on rows with the nearest matches
+
+particularly useful for time series data
+
+```
+ProductPriceHistory[ProductSales,
+                    on = .(product_id, date),
+                    roll = TRUE,
+                    nomatch = NULL]
+```
