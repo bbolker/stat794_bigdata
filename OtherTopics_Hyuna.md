@@ -12,7 +12,10 @@ Essentially same as ```dplyr```, but uses DuckDB in the back-end where possible 
 * No SQL is generated, unlike ```dbplyr```. Instead, DuckDB’s “relational” interface is used.
 * You can analyze larger-than-memory datasets from your disk or from the web.
 
-### 7.1 DuckDB Basics
+### 7.1 Introduction
+```
+library(duckplyr)
+```
 #### 7.1.1 Reading in CSV and Parquet files
 ```
 seattle_duck_csv <- read_csv_duckdb("Arrow/seattle-library-checkouts-tiny.csv")
