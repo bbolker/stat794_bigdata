@@ -39,12 +39,11 @@ class(flights_duck)
 delay_df <- flights_duck %>%
   mutate(inflightdelay = arr_delay - dep_delay) |>
   # delay in minutes, negative means early departure/arrival
-  group_by(year) %>%
   summarize(
     mean_inflightdelay = mean(inflightdelay, na.rm = TRUE),
     median_inflightdelay = median(inflightdelay, na.rm = TRUE),
   ) %>%
-  arrange(month)
+  collect()
 ```
 
 #### 7.1.3 Data from DuckDB
