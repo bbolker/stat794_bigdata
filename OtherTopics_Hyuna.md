@@ -441,13 +441,12 @@ seattle_dt[MaterialType == "BOOK", .N]
 
 * Aggregations
 ```
-seattle_dt["BOOK",.N, by = CheckoutYear]
-# dropping MaterialType == because we set key earlier
-seattle_dt["BOOK",.N, CheckoutYear]
+seattle_dt[MaterialType == "BOOK",.N, by = CheckoutYear]
+seattle_dt[MaterialType == "BOOK",.N, CheckoutYear]
 
-seattle_dt["BOOK",.N, by = .(CheckoutYear, CheckoutMonth)]
+seattle_dt[MaterialType == "BOOK",.N, by = .(CheckoutYear, CheckoutMonth)]
 
-seattle_dt["BOOK",
+seattle_dt[MaterialType == "BOOK",
            .(mean_checkout = mean(Checkouts),
              monthly_checkouts = sum(Checkouts)),
            .(CheckoutYear, CheckoutMonth)][
@@ -506,7 +505,7 @@ flights_dt[hour == 24L, hour := 0L][]
 flights_dt[, sort(unique(hour))]
 
 flights_dt[hour == 24L][, hour := 0L]
-head(flights_dt)
+flights_dt[, sort(unique(hour))]
 midnight_zero <- flights_dt[hour == 24L][, hour := 0L]
 nrow(midnight_zero)
 flights_dt[hour == 24L, .N]
@@ -578,9 +577,9 @@ setkey(flights_dt, origin)
 # setkeyv(seattle_dt, c("origin", "dest"))
 # particularly useful while designing functions to pass columns to set key on as function arguments
 
-seattle_dt["JFK"] # subsetting
-seattle_dt["LAX"] # right join with NA values
-seattle_dt[origin == "LAX"] # subsetting
+flights_dt["JFK"] # subsetting
+flights_dt["YYZ"] # right join with NA values
+flights_dt[origin == "YYZ"] # subsetting
 
 setkey(flights_dt, origin, dest) # keys are ordered
 flights_dt[.("JFK", "MSY")]
