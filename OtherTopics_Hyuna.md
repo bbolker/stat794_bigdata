@@ -437,10 +437,6 @@ seattle_dt[CheckoutYear == 2020 & MaterialType == "BOOK",
 
 ```
 seattle_dt[MaterialType == "BOOK", .N]
-seattle_dt["BOOK", .N]
-
-seattle_dt["BOOK", .N] |> system.time()
-nrow(seattle_dt[MaterialType == "BOOK"]) |> system.time()
 ```
 
 * Aggregations
@@ -572,6 +568,12 @@ Setting a key
   * Binary searches are especially fast
  
 ```
+setkey(seattle_dt, MaterialType)
+seattle_dt["BOOK", .N]
+
+seattle_dt["BOOK", .N] |> system.time()
+nrow(seattle_dt[MaterialType == "BOOK"]) |> system.time()
+
 setkey(flights_dt, origin)
 # setkeyv(seattle_dt, c("origin", "dest"))
 # particularly useful while designing functions to pass columns to set key on as function arguments
