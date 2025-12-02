@@ -78,6 +78,8 @@ dbListTables(con)
 docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11
 ```
 
+[notes on R on HPC](https://hackmd.io/@bbolker/r_hpc)
+
 ## References
 
 <div id="refs" class="references csl-bib-body hanging-indent"
