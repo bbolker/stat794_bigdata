@@ -78,7 +78,8 @@ dbListTables(con)
 docker run -e POSTGRES_PASSWORD="postgres" --detach  --name adventureworks --publish 5432:5432 --mount type=bind,source="$MYDIR",target=/petdir postgres:11
 ```
 
-[notes on R on HPC](https://hackmd.io/@bbolker/r_hpc)
+* [notes on R on HPC](https://hackmd.io/@bbolker/r_hpc)
+* https://www.practicalsignificance.com/posts/some-fast-spectral-decompositions-in-r/
 
 ## References
 
