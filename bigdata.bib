@@ -7,3 +7,68 @@
   abstract = {An introduction to Docker and PostgreSQL for R users to simulate use cases behind corporate walls.},
   url = {https://smithjd.github.io/sql-pet/}
 }
+
+@book{luraschiMasteringSparkComplete2019,
+  title = {Mastering {{Spark}} with {{R}}: {{The Complete Guide}} to {{Large-Scale Analysis}} and {{Modeling}}},
+  shorttitle = {Mastering {{Spark}} with {{R}}},
+  author = {Luraschi, Javier and Kuo, Kevin and Ruiz, Edgar},
+  year = 2019,
+    url = {https://therinspark.com/index.html},
+  publisher = {O'Reilly Media},
+  address = {Beijing China ; Sebastopol, CA},
+  abstract = {If you're like most R users, you have deep knowledge and love for statistics. But as your organization continues to collect huge amounts of data, adding tools such as Apache Spark makes a lot of sense. With this practical book, data scientists and professionals working with large-scale data applications will learn how to use Spark from R to tackle big data and big compute problems.Authors Javier Luraschi, Kevin Kuo, and Edgar Ruiz show you how to use R with Spark to solve different data analysis problems. This book covers relevant data science topics, cluster computing, and issues that should interest even the most advanced users.Analyze, explore, transform, and visualize data in Apache Spark with RCreate statistical models to extract information and predict outcomes; automate the process in production-ready workflowsPerform analysis and modeling across many machines using distributed computing techniquesUse large-scale data from multiple sources and different formats with ease from within SparkLearn about alternative modeling frameworks for graph processing, geospatial analysis, and genomics at scaleDive into advanced topics including custom transformations, real-time data processing, and creating custom Spark extensions},
+  isbn = {978-1-4920-4637-0},
+  langid = {english}
+}
+
+
+@misc{dragandsSwissKnife2020,
+  title = {{{dsSwissKnife}}: {{An R}} Package for Federated Data Analysis},
+  shorttitle = {{{dsSwissKnife}}},
+  author = {Dragan, Iulian and Spars{\o}, Thomas and Kuznetsov, Dmitry and Slieker, Roderick and Ibberson, Mark},
+  year = 2020,
+  month = nov,
+  primaryclass = {New Results},
+  pages = {2020.11.17.386813},
+  publisher = {bioRxiv},
+  doi = {10.1101/2020.11.17.386813},
+  urldate = {2023-11-15},
+  abstract = {Summary dsSwissKnife is an R package that enables several powerful analyses to be performed on federated datasets. The package works alongside DataSHIELD and extends its functionality. We have developed and implemented dsSwissKnife in a large IMI project on type 2 diabetes, RHAPSODY, where data from 10 observational cohorts have been harmonised and federated in CDISC SDTM format and made available for biomarker discovery. Availability and implementation dsSwissKnife is freely available online at https://github.com/sib-swiss/dsSwissKnife. The package is distributed under the GNU General Public License version 3. Contact mark.ibberson\textbraceleft at\textbraceright sib.swiss},
+  archiveprefix = {bioRxiv},
+  chapter = {New Results},
+  copyright = {\copyright{} 2020, Posted by Cold Spring Harbor Laboratory. This pre-print is available under a Creative Commons License (Attribution 4.0 International), CC BY 4.0, as described at http://creativecommons.org/licenses/by/4.0/},
+  langid = {english}
+}
+
+@article{gayeDataSHIELD2014,
+  title = {{{DataSHIELD}}: Taking the Analysis to the Data, Not the Data to the Analysis},
+  shorttitle = {{{DataSHIELD}}},
+  author = {Gaye, Amadou and Marcon, Yannick and Isaeva, Julia and LaFlamme, Philippe and Turner, Andrew and Jones, Elinor M and Minion, Joel and Boyd, Andrew W and Newby, Christopher J and Nuotio, Marja-Liisa and Wilson, Rebecca and Butters, Oliver and Murtagh, Barnaby and Demir, Ipek and Doiron, Dany and Giepmans, Lisette and Wallace, Susan E and {Budin-Lj{\o}sne}, Isabelle and Oliver Schmidt, Carsten and Boffetta, Paolo and Boniol, Mathieu and Bota, Maria and Carter, Kim W and {deKlerk}, Nick and Dibben, Chris and Francis, Richard W and Hiekkalinna, Tero and Hveem, Kristian and Kval{\o}y, Kirsti and Millar, Sean and Perry, Ivan J and Peters, Annette and Phillips, Catherine M and Popham, Frank and Raab, Gillian and Reischl, Eva and Sheehan, Nuala and Waldenberger, Melanie and Perola, Markus and {van den Heuvel}, Edwin and Macleod, John and Knoppers, Bartha M and Stolk, Ronald P and Fortier, Isabel and Harris, Jennifer R and Woffenbuttel, Bruce HR and Murtagh, Madeleine J and Ferretti, Vincent and Burton, Paul R},
+  year = 2014,
+  month = dec,
+  journal = {International Journal of Epidemiology},
+  volume = {43},
+  number = {6},
+  pages = {1929--1944},
+  issn = {0300-5771},
+  doi = {10.1093/ije/dyu188},
+  urldate = {2023-11-22},
+  abstract = {Background: Research in modern biomedicine and social science requires sample sizes so large that they can often only be achieved through a pooled co-analysis of data from several studies. But the pooling of information from individuals in a central database that may be queried by researchers raises important ethico-legal questions and can be controversial. In the UK this has been highlighted by recent debate and controversy relating to the UK's proposed `care.data' initiative, and these issues reflect important societal and professional concerns about privacy, confidentiality and intellectual property. DataSHIELD provides a novel technological solution that can circumvent some of the most basic challenges in facilitating the access of researchers and other healthcare professionals to individual-level data.Methods: Commands are sent from a central analysis computer (AC) to several data computers (DCs) storing the data to be co-analysed. The data sets are analysed simultaneously but in parallel. The separate parallelized analyses are linked by non-disclosive summary statistics and commands transmitted back and forth between the DCs and the AC. This paper describes the technical implementation of DataSHIELD using a modified R statistical environment linked to an Opal database deployed behind the computer firewall of each DC. Analysis is controlled through a standard R environment at the AC.Results: Based on this Opal/R implementation, DataSHIELD is currently used by the Healthy Obese Project and the Environmental Core Project (BioSHaRE-EU) for the federated analysis of 10 data sets across eight European countries, and this illustrates the opportunities and challenges presented by the DataSHIELD approach.Conclusions: DataSHIELD facilitates important research in settings where: (i) a co-analysis of individual-level data from several studies is scientifically necessary but governance restrictions prohibit the release or sharing of some of the required data, and/or render data access unacceptably slow; (ii) a research group (e.g. in a developing nation) is particularly vulnerable to loss of intellectual property---the researchers want to fully share the information held in their data with national and international collaborators, but do not wish to hand over the physical data themselves; and (iii) a data set is to be included in an individual-level co-analysis but the physical size of the data precludes direct transfer to a new site for analysis.},
+  file = {/home/bolker/Documents/zotero_new/storage/I9NQJKD3/Gaye et al. - 2014 - DataSHIELD taking the analysis to the data, not t.pdf;/home/bolker/Documents/zotero_new/storage/ZS2EEM5X/707730.html}
+}
+
+@article{hauschildFederated2022,
+  title = {Federated {{Random Forests}} Can Improve Local Performance of Predictive Models for Various Healthcare Applications},
+  author = {Hauschild, Anne-Christin and Lemanczyk, Marta and Matschinske, Julian and Frisch, Tobias and Zolotareva, Olga and Holzinger, Andreas and Baumbach, Jan and Heider, Dominik},
+  year = 2022,
+  month = apr,
+  journal = {Bioinformatics},
+  volume = {38},
+  number = {8},
+  pages = {2278--2286},
+  issn = {1367-4803},
+  doi = {10.1093/bioinformatics/btac065},
+  urldate = {2023-03-08},
+  abstract = {Limited data access has hindered the field of precision medicine from exploring its full potential, e.g. concerning machine learning and privacy and data protection rules.Our study evaluates the efficacy of federated Random Forests (FRF) models, focusing particularly on the heterogeneity within and between datasets. We addressed three common challenges: (i) number of parties, (ii) sizes of datasets and (iii) imbalanced phenotypes, evaluated on five biomedical datasets.The FRF outperformed the average local models and performed comparably to the data-centralized models trained on the entire data. With an increasing number of models and decreasing dataset size, the performance of local models decreases drastically. The FRF, however, do not decrease significantly. When combining datasets of different sizes, the FRF vastly improve compared to the average local models. We demonstrate that the FRF remain more robust and outperform the local models by analyzing different class-imbalances.Our results support that FRF overcome boundaries of clinical research and enables collaborations across institutes without violating privacy or legal regulations. Clinicians benefit from a vast collection of unbiased data aggregated from different geographic locations, demographics and other varying factors. They can build more generalizable models to make better clinical decisions, which will have relevance, especially for patients in rural areas and rare or geographically uncommon diseases, enabling personalized treatment. In combination with secure multi-party computation, federated learning has the power to revolutionize clinical practice by increasing the accuracy and robustness of healthcare AI and thus paving the way for precision medicine.The implementation of the federated random forests can be found at https://featurecloud.ai/.Supplementary data are available at Bioinformatics online.},
+  file = {/home/bolker/Documents/zotero_new/storage/K4B2YEG3/Hauschild et al. - 2022 - Federated Random Forests can improve local perform.pdf;/home/bolker/Documents/zotero_new/storage/F34TSCPG/6525214.html}
+}
