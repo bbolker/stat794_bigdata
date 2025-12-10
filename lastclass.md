@@ -36,4 +36,27 @@ title: "last class, miscellaneous"
 * lots of non-disclosure checks
 * @gayeDataSHIELD2014; @dragandsSwissKnife2020; @hauschildFederated2022
 
+## stochastic gradient descent
+
+* $\cal O(1)$ (!!)
+* distributed?
+* "distribute-once" problems
+
+## problem types/parallelization
+
+### easy
+
+* simulation testing of methods
+* simulation-based inference (bootstrap)
+* cross-validation
+* model selection
+
+at thread/GPU/[SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data) level: linear algebra (deep learning etc etc)
+
+### harder
+
+sequential approaches: requires multiple steps
+
+* particle filtering/particle MCMC
+
 ## references
